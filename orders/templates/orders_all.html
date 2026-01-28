@@ -1,7 +1,7 @@
 {% extends "temple.html" %}
 
 {% block content %} 
-<div class="m-3">
+<div>
   <h2>{{title}}</h2>
   <div class="hstack gap-3 p-2 d-print-none">
       <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#itemModal" onclick="onNewItem()">Создать</button>
@@ -41,17 +41,10 @@
         </div>
         <div class="modal-footer">
           <div class="hstack gap-3">
-            <div class="p-2">
-              <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="onDeleteItem()">Delete</button>
-            </div>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="onDeleteItem()">Delete</button>
+            <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Записать</button>
             <div class="vr"></div>
-            <div class="p-2">
-              <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Записать</button>
-            </div>
-            <div class="vr"></div>
-            <div class="p-2">  
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-            </div>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
           </div> 
         </div>
       </div>
