@@ -1,17 +1,23 @@
 {% extends "temple.html" %}
 
 {% block content %} 
-<h2>Вход для менеджеров по заказам</h2>
-<form method="post">
+<!-- div class="d-flex justify-content-center align-items-center" -->
+<form method="post"> 
   {% csrf_token %}
-  <div class="input-group mb-3">
-    <span class="input-group-text"> Имя пользователя </span>
-    {{ form.username }}
-  </div>
-  <div class="input-group mb-3"> 
-    <span class="input-group-text"> Пароль </span>
-    {{ form.password }}
-</div>
-  <button type="submit" class="btn btn-secondary">Войти</button>
+  <div class="row d-flex align-items-center justify-content-center">
+    <div class="col-md-auto">
+      <h3 class="text-center mb-4">Вход для менеджеров по заказам</h3>
+      <div class="input-group mb-3">
+        <span class="input-group-text"> Имя пользователя </span>
+        {{ form.username }}
+      </div>
+      <div class="input-group mb-3"> 
+        <span class="input-group-text"> Пароль </span>
+        {{ form.password }}
+      </div>
+      <button type="submit" class="btn btn-secondary">Войти</button>
+    </div>
+  </div>    
 </form>
+
 {% endblock %}
