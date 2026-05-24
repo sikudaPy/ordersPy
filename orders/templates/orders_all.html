@@ -13,22 +13,22 @@
           <th>Дата заказа</th>
           <th class="d-none d-lg-block">Организация</th>
           <th>Комментарий</th>
-          <th class='d-print-none'>Действие</th>
         </tr>
       </thead>
       <tbody class="table-group-divider">
         {% for x in context %}
-          <tr>
+          <tr data-bs-toggle="modal" data-bs-target="#itemModal" onclick="onViewItem('{{x.pk}}')">
               <td class="col-1">{{ x.number }}</td>
               <td class="col-1">{{ x.date|date:"d.m.Y" }}</td>
               <td class="d-none d-lg-block">{{ x.organization.name }}</td>
               <td class="col-6">{{ x.comment }}</td>
-              <td class="d-print-none col-1"><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#itemModal" onclick="onViewItem('{{x.pk}}')">Редактор</button></td>
           </tr>
         {% endfor %}
       </tbody>
   </table>
 </div>
+
+<!--Modal -->
 <div class="modal" id="itemModal">
   <div class="modal-dialog modal-xl modal-fullscreen-xl-down">
     <form method="post" action="" id="itemModalForm">
@@ -50,8 +50,10 @@
       </div>
     </form>
   </div>
-</div>  
+</div>
+
 <script>  
+
   async function onNewItem(){ 
     document.getElementById("itemModalTitle").innerHTML = "Новый заказ";
     document.getElementById("itemModalForm").action = "/orders/new/";
@@ -62,6 +64,7 @@
         hideLastEmptyLines();
       });
   }
+
   async function onViewItem(id=""){ 
     document.getElementById("itemModalForm").action = "/orders/edit/"+id+"/";
     document.getElementById("itemModalTitle").innerHTML = "Редактирование заказа"
@@ -72,8 +75,8 @@
         hideLastEmptyLines();
       });
   }
+  
   async function onNewLine(){ 
-
     const totalForms = document.getElementById("itemModalBodyLines");
     let lines = totalForms.querySelectorAll('.input-group');
     if( totalForms && lines.length > 0 ){
@@ -86,26 +89,25 @@
       }   
     } 
 
-
-    <!-- {% comment %} const totalForms = document.getElementById("itemModalBodyLines");
-    const lastLine = totalForms.lastElementChild;
-    const elemArray = lastLine.children[0].children[0].id.split("-");
-    const newCountId = elemArray[1].replace(/(\d+)+/g, function(match, number) {
-       return parseInt(number)+1;
-    });
-    const clonedLine   = totalForms.lastElementChild.cloneNode(true);
-    for(item in clonedLine.children){
-      setIdElem(clonedLine.children[item], newCountId)
-      for(item2 in clonedLine.children[item].children){
-        setIdElem(clonedLine.children[item].children[item2], newCountId)
-      }
-    }
-    totalForms.appendChild(clonedLine);
-    const countForms = document.getElementById("id_orderassortmenttablemodel_set-TOTAL_FORMS")
-    countForms.value = parseInt(countForms.value)+1; 
-    {% endcomment %}
-    -->
+    
+//       const totalForms = document.getElementById("itemModalBodyLines");
+//       const lastLine = totalForms.lastElementChild;
+//       const elemArray = lastLine.children[0].children[0].id.split("-");
+//       const newCountId = elemArray[1].replace(/(\d+)+/g, function(match, number) {
+//          return parseInt(number)+1;
+//       });
+//       const clonedLine   = totalForms.lastElementChild.cloneNode(true);
+//       for(item in clonedLine.children){
+//         setIdElem(clonedLine.children[item], newCountId)
+//         for(item2 in clonedLine.children[item].children){
+//           setIdElem(clonedLine.children[item].children[item2], newCountId)
+//         }
+//       }
+//       totalForms.appendChild(clonedLine);
+//       const countForms = document.getElementById("id_orderassortmenttablemodel_set-TOTAL_FORMS")
+//       countForms.value = parseInt(countForms.value)+1; 
   }
+  
   async function onDeleteLine(curDelete){
     const totalForms = document.getElementById("itemModalBodyLines"); 
     const currentLine   = curDelete.parentNode.parentNode; 
@@ -125,25 +127,25 @@
     }
   }
 
-  async function onChange(element){
-    const totalForms = document.getElementById("itemModalBodyLines");
-    const elemArray = element.id.split("-");
-    const elemCount = document.getElementById(elemArray[0]+"-"+elemArray[1]+"-count");
-    const elemPrice = document.getElementById(elemArray[0]+"-"+elemArray[1]+"-price");
-    const elemSumma = document.getElementById(elemArray[0]+"-"+elemArray[1]+"-summa");
-    const nameField = elemArray[elemArray.length-1];
-    switch(nameField){
-      case "count": 
-      case "price": 
-        elemSumma.value = elemCount.value*elemPrice.value;
-        break;
-      case "summa": 
-        if(elemCount.value != 0){
-           elemPrice.value = (elemSumma.value/elemCount.value).toFixed(2)
-        }
-        break;
-    } 
-  }
+  //async function onChange(element){
+  //  const totalForms = document.getElementById("itemModalBodyLines");
+  //  const elemArray = element.id.split("-");
+  //  const elemCount = document.getElementById(elemArray[0]+"-"+elemArray[1]+"-count");
+  //  const elemPrice = document.getElementById(elemArray[0]+"-"+elemArray[1]+"-price");
+  //  const elemSumma = document.getElementById(elemArray[0]+"-"+elemArray[1]+"-summa");
+  //  const nameField = elemArray[elemArray.length-1];
+  //  switch(nameField){
+  //    case "count": 
+  //    case "price": 
+  //      elemSumma.value = elemCount.value*elemPrice.value;
+  //      break;
+  //    case "summa": 
+  //      if(elemCount.value != 0){
+  //         elemPrice.value = (elemSumma.value/elemCount.value).toFixed(2)
+  //      }
+  //      break;
+  //  } 
+  //}
   
   function onDeleteItem(){
     const form = document.getElementById("itemModalForm");
