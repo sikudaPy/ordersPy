@@ -1,14 +1,15 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
-#from rest_framework.response import Response
-#from rest_framework import status
-#from rest_framework.views import APIView
 from django.template import loader
 from .models import OrderModel, ManagerModel
 from .forms import OrderForm, OrderAssortFormSet
-#from .serializers import OrderSerializer
 from django.contrib.auth import login, logout, authenticate
 from .forms import LoginForm
+
+#from .serializers import OrderSerializer
+#from rest_framework.response import Response
+#from rest_framework import status
+#from rest_framework.views import APIView
 
 def login_view(request):
     form = LoginForm(data=request.POST or None)
@@ -24,8 +25,6 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    # Optional: Add a success message using Django's messages framework
-    # messages.success(request, "You have been logged out.")
     return redirect('/') 
 
 
@@ -56,6 +55,8 @@ def order_list(request):
     if request.method == 'POST':
         return redirect('/orders/new')    
 
+    theme= request.GET.get("theme") or "auto"
+
     org = get_organization_by_request(request)
     orders = get_orders_by_request(request, org)
     template = loader.get_template('orders_all.html')
@@ -63,6 +64,7 @@ def order_list(request):
     context = {
         'title': "Заказы для организации: "+"Все организации" if org is None else org.name,
         'context': orders,
+        'theme': theme,
     }
     return HttpResponse(template.render(context, request))
 

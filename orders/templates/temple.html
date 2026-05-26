@@ -1,6 +1,19 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+{% if theme == 'auto' %}
+<html data-bs-theme='auto'>
+{% else %}
+  {% if theme == 'light' %}
+  <html data-bs-theme='light'>
+  {% else %}
+    {% if theme == 'dark' %}
+    <html data-bs-theme='dark'>
+    {% else %}
+    <html>
+    {% endif %}
+  {% endif %}
+{% endif %}
+
 <head>
   <title>{% block title %}{% endblock %}</title>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
@@ -9,38 +22,50 @@
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg bg-body-tertiary" style="background-color: #e3f2fd;">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#"></a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarScroll">
-      <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/orders">Заказы</a>
-        </li>
-      </ul>
-      <ul class="nav justify-content-right">
-      <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Еще...
-          </a>
-          <ul class="dropdown-menu">
-            <!-- li><a class="dropdown-item" href="/login">Вход</a></li -->
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="/logout">Выход</a></li>
-          </ul>
-      </li>
-      </ul>
-    </div>
+
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasSectionMenu" aria-labelledby="offcanvasSectionMenuLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasSectionMenuLabel">Меню разделов</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
-</nav>
+  <div class="offcanvas-body">
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">
+        <a href="/orders/?theme={{theme}}">Раздел заказов</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/admin">Администрирование</a>
+      </li>
+      <li class="list-group-item">
+        <a href="/logout">Выход пользователя</a>
+      </li>
+      <li class="list-group-item">
+      <div class="dropdown mt-3">
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+          Выбор темы
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item bg-light text-dark" onclick="setTheme('light')">Светлая тема</a></li>
+          <li><a class="dropdown-item bg-dark text-white" onclick="setTheme('dark')">Темная тема</a></li>
+          <li><a class="dropdown-item bg-auto text-auto" onclick="setTheme('auto')">Авто тема</a></li>
+        </ul>
+    </div>  
+      </li>
+    </ul>    
+  </div>
+</div>
 
 <div class= "container-fluid table-responsive">
 {% block content %}
 {% endblock %}
 </div>
 <script type="application/javascript" src="{% static 'bootstrap.bundle.min.js' %}"></script>
+<script>
+  function setTheme(nameTheme){
+    const url = new URL(window.location.href);
+    url.searchParams.set('theme', nameTheme);
+    window.location.href = url.toString();
+  }
+</script> 
 </body>
 </html>

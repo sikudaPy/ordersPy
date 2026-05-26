@@ -1,11 +1,37 @@
 {% extends "temple.html" %}
 
 {% block content %} 
+
+<!-- Список заказов -->
 <div>
-  <h2>{{title}}</h2>
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary  d-print-none">
+  <div class="container-fluid gap-4">
+    <a class="btn btn-primary" data-bs-toggle="offcanvas" href="#offcanvasSectionMenu" role="button" aria-controls="offcanvasSectionMenu"> 
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-90deg-left" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M1.146 4.854a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H12.5A2.5 2.5 0 0 1 15 6.5v8a.5.5 0 0 1-1 0v-8A1.5 1.5 0 0 0 12.5 5H2.707l3.147 3.146a.5.5 0 1 1-.708.708z"></path>
+      </svg>
+    </a>
+    <a class="navbar-brand" role="button" id="btnUpdate" href="/orders">Список заказов</a>
+    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#itemModal" onclick="onNewItem()">Создать</button>
+    <div class="collapse navbar-collapse md-10" id="navbarSupportedContent">
+      <input class="form-control me-2" type="text" onchange="onFilter()" id="findString" placeholder="Фильтр..." value="{{ filter }}"/>  
+      <!--
+      <ul class="navbar-nav me-auto mb-2 mb-md-0">
+        <li class="nav-item">
+          <a class="nav-link disabled" aria-disabled="true"> </a>
+        </li>
+      </ul>
+      <a class="btn btn-outline-primary me-2" role="button" id="btnSettings" data-bs-toggle="modal" data-bs-target="#Settings">Настройки</a>
+    -->
+    </div>
+  </div>
+</nav>
+
+  <!-- h2>{{title}}</h2>
   <div class="hstack gap-3 p-2 d-print-none">
       <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#itemModal" onclick="onNewItem()">Создать</button>
-  </div>
+  </div -->
   <table class="table table-striped table-bordered">
       <thead>
         <tr> 
@@ -28,7 +54,7 @@
   </table>
 </div>
 
-<!--Modal -->
+<!--Карточка заказа -->
 <div class="modal" id="itemModal">
   <div class="modal-dialog modal-xl modal-fullscreen-xl-down">
     <form method="post" action="" id="itemModalForm">
