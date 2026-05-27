@@ -2,14 +2,6 @@ from django.contrib import admin
 from django.http import HttpResponse
 from .models import OrganizationModel, AssortmentModel, ManagerModel, OrderModel, OrderAssortmentTableModel
 
-admin.site.register(AssortmentModel)
-admin.site.register(OrganizationModel)
-
-class ManagerModelAdmin(admin.ModelAdmin):
-  list_display = ("name", "organization", "user")
-  list_filter = ('organization__name','name', 'user')
-admin.site.register(ManagerModel, ManagerModelAdmin)
-
 class OrderAssortmentlInline(admin.TabularInline):
     model = OrderAssortmentTableModel
     extra = 1

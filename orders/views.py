@@ -1,10 +1,12 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.template import loader
-from .models import OrderModel, ManagerModel
+from .models import OrderModel 
+from organizations.models import ManagerModel
 from .forms import OrderForm, OrderAssortFormSet
 from django.contrib.auth import login, logout, authenticate
 from .forms import LoginForm
+from django.db.models import Q
 
 #from .serializers import OrderSerializer
 #from rest_framework.response import Response
@@ -39,13 +41,15 @@ def get_organization_by_request(request):
 def get_orders_by_request(request, org=None):
     if org == None:
         org = get_organization_by_request(request)
+
+    strFind = request.GET.get("strFind") or ""
     if request.user.is_superuser:
-        orders = OrderModel.objects.all()
+        orders = getOrdersByFilter(strFind)
     else:
         if org == None:
             orders = OrderModel.objects.none()
         else:
-            orders = OrderModel.objects.filter(organization=org)       
+            orders = getOrdersByFilter(strFind).filter(organization=org)       
     return orders        
 
 def order_list(request):
@@ -56,6 +60,7 @@ def order_list(request):
         return redirect('/orders/new')    
 
     theme= request.GET.get("theme") or "auto"
+    strFind = request.GET.get("strFind") or ""
 
     org = get_organization_by_request(request)
     orders = get_orders_by_request(request, org)
@@ -65,6 +70,7 @@ def order_list(request):
         'title': "Заказы для организации: "+"Все организации" if org is None else org.name,
         'context': orders,
         'theme': theme,
+        'strFind': strFind
     }
     return HttpResponse(template.render(context, request))
 
@@ -140,6 +146,16 @@ def order_del(request, pk):
 
 def order_root(request):
     return redirect('orders/') 
+
+#Special functions -----------------------------------------------------------------------------------------    
+def getOrdersByFilter(strFind: str = ""):
+    return OrderModel.objects.filter(
+        Q(number__icontains=strFind) | 
+        Q(date__icontains=strFind) |
+        Q(comment__icontains=strFind) |
+        Q(summa__icontains=strFind) 
+        ).order_by('date') 
+
 
 # class OrdersListAPI(APIView):
 #     #permission_classes = (permissions.IsAuthenticated,)

@@ -1,30 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
 import uuid
-from django.db.models import Sum
-
-class OrganizationModel(models.Model):
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return f"{self.name}"
-
-class AssortmentModel(models.Model):
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return f"{self.name}"
-
-class ManagerModel(models.Model):
-    uuid = models.UUIDField(primary_key=True, null=False,default=uuid.uuid4)
-    organization = models.ForeignKey(OrganizationModel, on_delete = models.CASCADE)
-    name = models.CharField(max_length=255)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
-    
-    def __str__(self):
-        return f"{self.name}"
+from assortment.models import AssortmentModel
+from organizations.models import OrganizationModel, ManagerModel
 
 class OrderModel(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
@@ -37,7 +15,7 @@ class OrderModel(models.Model):
 
 class OrderAssortmentTableModel(models.Model):
     order = models.ForeignKey(OrderModel, on_delete = models.CASCADE)
-    #num = models.PositiveIntegerField(default=1)
+    num = models.PositiveIntegerField(default=1)
     assortiment = models.ForeignKey(AssortmentModel, on_delete = models.PROTECT)
     count = models.DecimalField(max_digits=19, decimal_places=0, default=0)
     price = models.DecimalField(max_digits=19, decimal_places=2, default=0)

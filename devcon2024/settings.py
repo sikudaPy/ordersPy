@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     #'rest_framework',
     #'drf_yasg',
     'orders',
-    'feedback'
+    'assortment',
+    'organizations',
 ]
 
 MIDDLEWARE = [

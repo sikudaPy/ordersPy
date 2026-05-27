@@ -15,7 +15,7 @@
     <a class="navbar-brand" role="button" id="btnUpdate" href="/orders">Список заказов</a>
     <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#itemModal" onclick="onNewItem()">Создать</button>
     <div class="collapse navbar-collapse md-10" id="navbarSupportedContent">
-      <input class="form-control me-2" type="text" onchange="onFilter()" id="findString" placeholder="Фильтр..." value="{{ filter }}"/>  
+      <input class="form-control me-2" type="text" onchange="onFilter()" id="findString" placeholder="Фильтр..." value="{{ strFind }}"/>  
       <!--
       <ul class="navbar-nav me-auto mb-2 mb-md-0">
         <li class="nav-item">
@@ -80,6 +80,13 @@
 
 <script>  
 
+  function onFilter(){
+    const url = new URL(window.location.href);
+    strFind = document.getElementById("findString").value.toString()
+    url.searchParams.set('strFind', strFind);
+    window.location.href = url.toString();  
+  }
+
   async function onNewItem(){ 
     document.getElementById("itemModalTitle").innerHTML = "Новый заказ";
     document.getElementById("itemModalForm").action = "/orders/new/";
@@ -113,9 +120,7 @@
           break;
         }
       }   
-    } 
-
-    
+    }   
 //       const totalForms = document.getElementById("itemModalBodyLines");
 //       const lastLine = totalForms.lastElementChild;
 //       const elemArray = lastLine.children[0].children[0].id.split("-");
