@@ -9,9 +9,6 @@ class OrganizationModel(models.Model):
     def __str__(self):
         return f"{self.name}"
 
-    def __str__(self):
-        return f"{self.name}"
-
 class ManagerModel(models.Model):
     uuid = models.UUIDField(primary_key=True, null=False,default=uuid.uuid4)
     organization = models.ForeignKey(OrganizationModel, on_delete = models.CASCADE)
