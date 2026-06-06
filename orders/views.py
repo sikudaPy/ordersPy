@@ -152,6 +152,7 @@ def getOrdersByFilter(strFind: str = ""):
     return OrderModel.objects.filter(
         Q(number__icontains=strFind) | 
         Q(date__icontains=strFind) |
+        Q(organization__name__icontains=strFind) |
         Q(comment__icontains=strFind) |
         Q(summa__icontains=strFind) 
         ).order_by('date') 

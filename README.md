@@ -10,7 +10,7 @@ venv/Scripts/activate (source venv/bin/activate)
 3.  Установка пакетов
 pip install -r requirements.txt
 4. Сделать миграцию
-python manage.py makemigrations orders feedback
+python manage.py makemigrations orders assortment organizations
 python manage.py migrate
 5. Сделать админа
 python manage.py createsuperuser
