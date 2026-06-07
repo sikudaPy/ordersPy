@@ -1,1 +1,4 @@
 Django>=5.2
+djangorestframework
+pyside6
+pyinstaller

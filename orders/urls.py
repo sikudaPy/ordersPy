@@ -3,7 +3,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import path
 from . import views
 
-#from rest_framework import permissions
+from rest_framework import permissions
 #from drf_yasg.views import get_schema_view
 #from drf_yasg import openapi
 
@@ -29,9 +29,7 @@ urlpatterns = [
     
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
-    #path('accounts/profile/', views.order_root),
-    #path('accounts/profile/orders', views.order_root),
-    #path('orders-api/', views.OrdersListAPI.as_view(), name='article-api'),
+    path('orders-api/', views.OrdersListAPI.as_view(), name='article-api'),
     #path('orders-api/<pk>/', views.OrdersAPI.as_view(), name='article-api'),
 
     #path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),

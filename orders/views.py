@@ -3,15 +3,15 @@ from django.http import HttpResponse
 from django.template import loader
 from .models import OrderModel 
 from organizations.models import ManagerModel
-from .forms import OrderForm, OrderAssortFormSet
+from .forms import OrderAssortFormSet, OrderForm
 from django.contrib.auth import login, logout, authenticate
 from .forms import LoginForm
 from django.db.models import Q
 
-#from .serializers import OrderSerializer
-#from rest_framework.response import Response
-#from rest_framework import status
-#from rest_framework.views import APIView
+from .serializers import OrderSerializer
+from rest_framework.response import Response
+from rest_framework import permissions
+from rest_framework.views import APIView
 
 def login_view(request):
     form = LoginForm(data=request.POST or None)
@@ -157,22 +157,22 @@ def getOrdersByFilter(strFind: str = ""):
         Q(summa__icontains=strFind) 
         ).order_by('date') 
 
+#API functions -----------------------------------------------------------------------------------------    
+class OrdersListAPI(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    def get(self, request, format=None):
+         articles = OrderModel.objects.all()
+         serializer = OrderSerializer(articles, many=True)
+         return Response(serializer.data)
 
-# class OrdersListAPI(APIView):
-#     #permission_classes = (permissions.IsAuthenticated,)
-#     def get(self, request, format=None):
-#          articles = OrderModel.objects.all()
-#          serializer = OrderSerializer(articles, many=True)
-#          return Response(serializer.data)
-#
-#     def post(self, request, format=None):
-#         serializer = OrderSerializer(data=request.data)
-#         # if serializer.uuid == "":
-#         #     serializer.uuid = uuid.uuid4()
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request, format=None):
+        serializer = OrderSerializer(data=request.data)
+        # if serializer.uuid == "":
+        #     serializer.uuid = uuid.uuid4()
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 #
 #
 # class OrdersAPI(APIView):
