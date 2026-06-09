@@ -14,7 +14,7 @@ class OrderModel(models.Model):
 
 
 class OrderAssortmentTableModel(models.Model):
-    order = models.ForeignKey(OrderModel, on_delete = models.CASCADE)
+    order = models.ForeignKey(OrderModel, related_name='table', on_delete = models.CASCADE)
     num = models.PositiveIntegerField(default=1)
     assortiment = models.ForeignKey(AssortmentModel, on_delete = models.PROTECT)
     count = models.DecimalField(max_digits=19, decimal_places=0, default=0)
