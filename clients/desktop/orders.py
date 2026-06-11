@@ -1,7 +1,7 @@
 import sys, json
-from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtWidgets
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QWidget, QHBoxLayout,QLineEdit,QMessageBox
+from PySide6.QtWidgets import QDialog, QHeaderView, QVBoxLayout, QLabel, QPushButton, QWidget, QHBoxLayout,QLineEdit,QTextEdit, QMessageBox
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
 from PySide6.QtCore import QUrl
 
@@ -13,23 +13,45 @@ class ItemDialog(QDialog):
         
         # Create a layout to hold widgets
         layout = QVBoxLayout()
-        text = "<h1>Получаю данные</h1>"
-        self.label = QLabel(text)
-        self.label.setWordWrap(True) 
+        layoutNumber = QHBoxLayout()
+        self.data_number = QLineEdit("")
+        self.data_date = QLineEdit("")
+        layoutNumber.addWidget(QLabel("Номер:"))
+        layoutNumber.addWidget(self.data_number)
+        layoutNumber.addWidget(QLabel("Дата:"))
+        layoutNumber.addWidget(self.data_date)
+        layout.addLayout(layoutNumber)
 
-        # Add label to the layout and set the layout for the dialog
-        layout.addWidget(self.label)
-        self.setLayout(layout)
+        #organization
+        layoutOrg = QHBoxLayout()
+        layoutOrg.addWidget( QLabel("Организация"))
+        self.data_org = QLineEdit("")
+        layoutOrg.addWidget( self.data_org)
+        layout.addLayout(layoutOrg)
 
+        #comment
+        layout.addWidget( QLabel("Комментарий"))
+        self.data_comment = QTextEdit("")
+        self.data_comment.setPlaceholderText("Введите многострочный текст здесь...")
+        self.data_comment.setMaximumHeight(48)
+        layout.addWidget( self.data_comment)
+        
+        self.table = QtWidgets.QTableView()
+        layout.addWidget( self.table)
+
+        #buttons       
+        layoutButtons = QHBoxLayout()
         self.close_btn = QPushButton("Закрыть")
-        layout.addWidget(self.close_btn)
+        layoutButtons.addWidget(self.close_btn, alignment= Qt.AlignmentFlag.AlignRight)
         self.close_btn.clicked.connect(self.reject)
+        layout.addLayout(layoutButtons)
 
+        self.setLayout(layout)
         self.start_request(id)
 
     def start_request(self, id):
               
-        url = QUrl("http://127.0.0.1:8000/orders-api/"+id+"/?format=json")
+        url = QUrl("https://d1.www-1c.ru/orders-api/"+id+"/?format=json")
         request = QNetworkRequest(url)
         self.reply = self.network_manager.get(request)
         self.reply.finished.connect(self.handle_response)
@@ -38,7 +60,11 @@ class ItemDialog(QDialog):
         if self.reply.error() == QNetworkReply.NetworkError.NoError:
             # Читаем данные
             text = self.reply.readAll().data().decode("utf-8")
-            self.label.setText(text)
+            data = json.loads(text);
+            self.data_number.setText(data["number"])
+            self.data_date.setText(data["date"])
+            self.data_org.setText(data["org_name"])
+            self.data_comment.setText(data["comment"])
         else:
             # Обработка ошибки
             error_str = self.reply.errorString()
@@ -55,15 +81,15 @@ class TableModel(QtCore.QAbstractTableModel):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             match section:
                 case 0:
-                    return "Number"
+                    return "Номер"
                 case 1:
-                    return "Date"
+                    return "Дата"
                 case 2:
-                    return "Organization"
+                    return "Организация"
                 case 3:
-                    return "Comment"
+                    return "Комментарий"
                 case 4:
-                    return "Summa"
+                    return "Сумма"
                 case _:
                     return ""
         return super().headerData(section, orientation, role)
@@ -99,8 +125,10 @@ class TableModel(QtCore.QAbstractTableModel):
                 case 5:
                     return self.catalogs[index.row()]["summa"]
                 case _:
-                    return ""        
-                        
+                    return "" 
+
+        if role == Qt.ItemDataRole.TextAlignmentRole and index.column() == 4:
+            return Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter                                      
 
     def rowCount(self, index):
         return len(self.catalogs)
@@ -137,7 +165,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def start_request(self):
               
         #url = QUrl("https://python1c.ru/catalogs/api?format=json")
-        url = QUrl("http://127.0.0.1:8000/orders-api/?format=json")
+        url = QUrl("https://d1.www-1c.ru/orders-api/?format=json")
         request = QNetworkRequest(url)
                 
         # Отправляем GET запрос
@@ -163,7 +191,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.table.resizeColumnToContents(0)
         self.table.resizeColumnToContents(1)
         self.table.resizeColumnToContents(2)
-        self.table.resizeColumnToContents(3)
+        header = self.table.horizontalHeader()    
+        header.setSectionResizeMode(3, QHeaderView.Stretch)
+        #self.table.resizeColumnToContents(3)
         self.table.resizeColumnToContents(4)
         #self.table.setColumnWidth(1, 600)
         self.table.clicked.connect(self.show_item)

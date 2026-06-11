@@ -16,7 +16,8 @@ class OrderAssortmentTableSerializer(serializers.ModelSerializer):
           
 class OrderSerializer(serializers.ModelSerializer):
     table = OrderAssortmentTableSerializer(many=True)  # Вложенный сериализатор
+    org_name = serializers.StringRelatedField(source='organization')
 
     class Meta:
         model = OrderModel
-        fields = ['uuid', 'number', 'date', 'organization', 'comment', 'summa', 'table']          
+        fields = ['uuid', 'number', 'date', 'organization', 'org_name', 'comment', 'summa', 'table']  
