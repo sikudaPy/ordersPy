@@ -1,7 +1,7 @@
 import sys, json
 from PySide6 import QtCore, QtWidgets
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QDialog, QHeaderView, QVBoxLayout, QLabel, QPushButton, QWidget, QHBoxLayout,QLineEdit,QTextEdit, QMessageBox
+from PySide6.QtCore import Qt, QDate
+from PySide6.QtWidgets import QDialog, QHeaderView, QVBoxLayout, QLabel, QPushButton, QWidget, QHBoxLayout,QDateEdit,QLineEdit,QTextEdit, QMessageBox
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
 from PySide6.QtCore import QUrl
 
@@ -15,7 +15,10 @@ class ItemDialog(QDialog):
         layout = QVBoxLayout()
         layoutNumber = QHBoxLayout()
         self.data_number = QLineEdit("")
-        self.data_date = QLineEdit("")
+        self.data_date = QDateEdit()
+        self.data_date.setCalendarPopup(True)
+        self.data_date.setDisplayFormat("dd.MM.yyyy")
+
         layoutNumber.addWidget(QLabel("Номер:"))
         layoutNumber.addWidget(self.data_number)
         layoutNumber.addWidget(QLabel("Дата:"))
@@ -36,7 +39,9 @@ class ItemDialog(QDialog):
         self.data_comment.setMaximumHeight(48)
         layout.addWidget( self.data_comment)
         
-        self.table = QtWidgets.QTableView()
+        self.table = QtWidgets.QTableWidget(0,4)
+        self.table.setHorizontalHeaderLabels(["Ассортимент", "Количество","Цена","Сумма"])
+
         layout.addWidget( self.table)
 
         #buttons       
@@ -62,13 +67,22 @@ class ItemDialog(QDialog):
             text = self.reply.readAll().data().decode("utf-8")
             data = json.loads(text);
             self.data_number.setText(data["number"])
-            self.data_date.setText(data["date"])
+            self.data_date.setDate(QDate.fromString(data["date"], "yyyy-MM-dd"))
             self.data_org.setText(data["org_name"])
             self.data_comment.setText(data["comment"])
+            table = data["table"]
+            self.table.setRowCount(len(table))
+            index = 0
+            for item in table:
+                self.table.setItem(index, 0, QtWidgets.QTableWidgetItem(item["assortiment"]))
+                self.table.setItem(index, 1, QtWidgets.QTableWidgetItem(item["count"]))
+                self.table.setItem(index, 2, QtWidgets.QTableWidgetItem(item["price"]))
+                self.table.setItem(index, 3, QtWidgets.QTableWidgetItem(item["summa"]))
+                index = index + 1
         else:
             # Обработка ошибки
             error_str = self.reply.errorString()
-            self.label.setText(error_str)
+            self.layout.addWidget(QLabel(error_str))
             
         self.reply.deleteLater()
 
@@ -218,7 +232,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
 app = QtWidgets.QApplication(sys.argv)
 window = MainWindow()
-window.setMinimumWidth(1024)
-window.setMinimumHeight(768)
+window.setMinimumWidth(800)
+window.setMinimumHeight(600)
 window.show()
 app.exec()    
