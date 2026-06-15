@@ -1,7 +1,7 @@
 import sys, json
 from PySide6 import QtCore, QtWidgets
-from PySide6.QtCore import Qt, QDate
-from PySide6.QtWidgets import QDialog, QHeaderView, QVBoxLayout, QLabel, QPushButton, QWidget, QHBoxLayout,QDateEdit,QLineEdit,QTextEdit, QMessageBox
+from PySide6.QtCore import Qt, QDate, QUuid
+from PySide6.QtWidgets import QDialog, QHeaderView, QVBoxLayout, QLabel, QPushButton, QWidget, QHBoxLayout,QDateEdit,QLineEdit,QTextEdit, QMessageBox, QComboBox
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
 from PySide6.QtCore import QUrl
 
@@ -28,7 +28,8 @@ class ItemDialog(QDialog):
         #organization
         layoutOrg = QHBoxLayout()
         layoutOrg.addWidget( QLabel("Организация"))
-        self.data_org = QLineEdit("")
+        self.data_org = QComboBox() #QLineEdit("")
+
         layoutOrg.addWidget( self.data_org)
         layout.addLayout(layoutOrg)
 
@@ -55,8 +56,9 @@ class ItemDialog(QDialog):
         self.start_request(id)
 
     def start_request(self, id):
-              
-        url = QUrl("https://d1.www-1c.ru/orders-api/"+id+"/?format=json")
+
+        url = QUrl("http://127.0.0.1:8000/orders-api/"+id+"/?format=json")      
+        #url = QUrl("https://d1.www-1c.ru/orders-api/"+id+"/?format=json")
         request = QNetworkRequest(url)
         self.reply = self.network_manager.get(request)
         self.reply.finished.connect(self.handle_response)
@@ -68,7 +70,14 @@ class ItemDialog(QDialog):
             data = json.loads(text);
             self.data_number.setText(data["number"])
             self.data_date.setDate(QDate.fromString(data["date"], "yyyy-MM-dd"))
-            self.data_org.setText(data["org_name"])
+            #self.data_org.setText(data["org_name"])
+            for item in data["all_organizations"]:
+                self.data_org.addItem(item['name'], userData=QUuid(item['uuid']))
+            org_uuid = QUuid("{"+data["organization"]+"}")
+            index = self.data_org.findData(org_uuid)
+            if index != -1:
+                self.data_org.setCurrentIndex(index)
+    
             self.data_comment.setText(data["comment"])
             table = data["table"]
             self.table.setRowCount(len(table))
@@ -178,8 +187,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def start_request(self):
               
-        #url = QUrl("https://python1c.ru/catalogs/api?format=json")
-        url = QUrl("https://d1.www-1c.ru/orders-api/?format=json")
+        url = QUrl("http://127.0.0.1:8000/orders-api/?format=json")
+        #url = QUrl("https://d1.www-1c.ru/orders-api/?format=json")
         request = QNetworkRequest(url)
                 
         # Отправляем GET запрос

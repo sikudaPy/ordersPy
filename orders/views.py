@@ -8,7 +8,7 @@ from django.contrib.auth import login, logout, authenticate
 from .forms import LoginForm
 from django.db.models import Q
 
-from .serializers import OrderSerializer, OrderListSerializer
+from .serializers import OrderDialogSerializer, OrderListSerializer
 from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework.views import APIView
@@ -179,7 +179,8 @@ class OrdersAPI(APIView):
      #permission_classes = (permissions.IsAuthenticated,)
      def get(self, request, pk, format=None):
          order = OrderModel.objects.get(pk=pk)
-         serializer = OrderSerializer(order)
+         #serializer = OrderSerializer(order)
+         serializer = OrderDialogSerializer(order)
          return Response(serializer.data)
 
 #     def put(self, request, pk, format=None):
