@@ -7,7 +7,6 @@ from .forms import OrderAssortFormSet, OrderForm
 from django.contrib.auth import login, logout, authenticate
 from .forms import LoginForm
 from django.db.models import Q
-
 from .serializers import OrderDialogSerializer, OrderListSerializer
 from rest_framework.response import Response
 from rest_framework import permissions

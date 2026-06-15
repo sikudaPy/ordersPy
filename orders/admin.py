@@ -20,9 +20,3 @@ def make_count(modeladmin, request, queryset):
     return HttpResponse("Selected lines were successfully update.")
 make_count.short_description = "Count field count"
 
-# class OrderAssortmentTableModelAdmin(admin.ModelAdmin):
-#    ordering = ('num',)
-#    actions = [make_count]
-#    readonly_fields = ('num','assortiment','summa')
-
-# admin.site.register(OrderAssortmentTableModel, OrderAssortmentTableModelAdmin)

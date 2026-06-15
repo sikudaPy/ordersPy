@@ -43,7 +43,7 @@ class ItemDialog(QDialog):
         self.table = QtWidgets.QTableWidget(0,4)
         self.table.setHorizontalHeaderLabels(["Ассортимент", "Количество","Цена","Сумма"])
 
-        layout.addWidget( self.table)
+        layout.addWidget(self.table)
 
         #buttons       
         layoutButtons = QHBoxLayout()
@@ -54,11 +54,12 @@ class ItemDialog(QDialog):
 
         self.setLayout(layout)
         self.start_request(id)
+        self.setMinimumWidth(600)
 
     def start_request(self, id):
 
-        url = QUrl("http://127.0.0.1:8000/orders-api/"+id+"/?format=json")      
-        #url = QUrl("https://d1.www-1c.ru/orders-api/"+id+"/?format=json")
+        #url = QUrl("http://127.0.0.1:8000/orders-api/"+id+"/?format=json")      
+        url = QUrl("https://d1.www-1c.ru/orders-api/"+id+"/?format=json")
         request = QNetworkRequest(url)
         self.reply = self.network_manager.get(request)
         self.reply.finished.connect(self.handle_response)
@@ -83,16 +84,33 @@ class ItemDialog(QDialog):
             self.table.setRowCount(len(table))
             index = 0
             for item in table:
-                self.table.setItem(index, 0, QtWidgets.QTableWidgetItem(item["assortiment"]))
-                self.table.setItem(index, 1, QtWidgets.QTableWidgetItem(item["count"]))
-                self.table.setItem(index, 2, QtWidgets.QTableWidgetItem(item["price"]))
-                self.table.setItem(index, 3, QtWidgets.QTableWidgetItem(item["summa"]))
+                #self.table.setItem(index, 0, QtWidgets.QTableWidgetItem(item["assortment"]))
+                asrt_combo = QComboBox()
+                for asrt in data["all_assortment"]:
+                    asrt_combo.addItem(asrt['name'], userData=QUuid(asrt['uuid']))
+                asrt_uuid = QUuid("{"+item["assortment"]+"}")
+                index_asrt = asrt_combo.findData(asrt_uuid)
+                if index_asrt != -1:
+                    asrt_combo.setCurrentIndex(index_asrt)
+                self.table.setCellWidget(index, 0, asrt_combo)
+
+                itemCount = QtWidgets.QTableWidgetItem(item["count"])
+                itemCount.setTextAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignRight)
+                self.table.setItem(index, 1, itemCount)
+                itemPrice = QtWidgets.QTableWidgetItem(item["price"])
+                itemPrice.setTextAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignRight)
+                self.table.setItem(index, 2, itemPrice)
+                itemCount = QtWidgets.QTableWidgetItem(item["summa"])
+                itemCount.setTextAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignRight)
+                self.table.setItem(index, 3, itemCount)
                 index = index + 1
+
+            self.table.resizeColumnToContents(0)
         else:
             # Обработка ошибки
             error_str = self.reply.errorString()
-            self.layout.addWidget(QLabel(error_str))
-            
+            self.layout().addWidget(QLabel(error_str))   
+
         self.reply.deleteLater()
 
 class TableModel(QtCore.QAbstractTableModel):
@@ -187,8 +205,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def start_request(self):
               
-        url = QUrl("http://127.0.0.1:8000/orders-api/?format=json")
-        #url = QUrl("https://d1.www-1c.ru/orders-api/?format=json")
+        #url = QUrl("http://127.0.0.1:8000/orders-api/?format=json")
+        url = QUrl("https://d1.www-1c.ru/orders-api/?format=json")
         request = QNetworkRequest(url)
                 
         # Отправляем GET запрос
