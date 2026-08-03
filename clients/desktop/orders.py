@@ -59,7 +59,7 @@ class ItemDialog(QDialog):
     def start_request(self, id):
 
         #url = QUrl("http://127.0.0.1:8000/orders-api/"+id+"/?format=json")      
-        url = QUrl("https://d1.www-1c.ru/orders-api/"+id+"/?format=json")
+        url = QUrl("https://orders.python1c.ru/orders-api/"+id+"/?format=json")
         request = QNetworkRequest(url)
         self.reply = self.network_manager.get(request)
         self.reply.finished.connect(self.handle_response)
@@ -206,7 +206,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def start_request(self):
               
         #url = QUrl("http://127.0.0.1:8000/orders-api/?format=json")
-        url = QUrl("https://d1.www-1c.ru/orders-api/?format=json")
+        url = QUrl("https://orders.python1c.ru/orders-api/?format=json")
         request = QNetworkRequest(url)
                 
         # Отправляем GET запрос
