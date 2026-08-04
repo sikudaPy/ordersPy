@@ -1,9 +1,13 @@
+import base64
 import sys, json
 from PySide6 import QtCore, QtWidgets
-from PySide6.QtCore import Qt, QDate, QUuid
+from PySide6.QtCore import QByteArray, Qt, QDate, QUuid
 from PySide6.QtWidgets import QDialog, QHeaderView, QVBoxLayout, QLabel, QPushButton, QWidget, QHBoxLayout,QDateEdit,QLineEdit,QTextEdit, QMessageBox, QComboBox
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
 from PySide6.QtCore import QUrl
+
+#local for test
+credentials = "admin:impimp13"
 
 class ItemDialog(QDialog):
     def __init__(self, network_manager, id):
@@ -58,9 +62,11 @@ class ItemDialog(QDialog):
 
     def start_request(self, id):
 
-        #url = QUrl("http://127.0.0.1:8000/orders-api/"+id+"/?format=json")      
-        url = QUrl("https://orders.python1c.ru/orders-api/"+id+"/?format=json")
+        url = QUrl("http://127.0.0.1:8000/orders-api/"+id+"/?format=json")      
+        #url = QUrl("https://orders.python1c.ru/orders-api/"+id+"/?format=json")
         request = QNetworkRequest(url)
+        encoded_credentials = base64.b64encode(credentials.encode('utf-8')).decode('utf-8')
+        request.setRawHeader(b"Authorization", f"Basic {encoded_credentials}".encode('utf-8'))
         self.reply = self.network_manager.get(request)
         self.reply.finished.connect(self.handle_response)
 
@@ -205,12 +211,14 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def start_request(self):
               
-        #url = QUrl("http://127.0.0.1:8000/orders-api/?format=json")
-        url = QUrl("https://orders.python1c.ru/orders-api/?format=json")
-        request = QNetworkRequest(url)
-                
+        url = QUrl("http://127.0.0.1:8000/orders-api/?format=json")
+        #url = QUrl("https://orders.python1c.ru/orders-api/?format=json")
+        request = QNetworkRequest(url)      
+        encoded_credentials = base64.b64encode(credentials.encode('utf-8')).decode('utf-8')
+        request.setRawHeader(b"Authorization", f"Basic {encoded_credentials}".encode('utf-8'))
+
         # Отправляем GET запрос
-        self.reply = self.network_manager.get(request)
+        self.reply = self.network_manager.get(request) #, jsonString)
         
         # Подключаем сигнал завершения
         self.reply.finished.connect(self.handle_response)
