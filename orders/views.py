@@ -9,7 +9,7 @@ from .forms import LoginForm
 from django.db.models import Q
 from .serializers import OrderDialogSerializer, OrderListSerializer, OrderSerializer
 from rest_framework.response import Response
-from rest_framework import permissions
+from rest_framework import permissions, status
 from rest_framework.views import APIView
 
 def login_view(request):
@@ -182,17 +182,17 @@ class OrdersAPI(APIView):
          serializer = OrderDialogSerializer(order)
          return Response(serializer.data)
 
-    # permission_classes = (permissions.IsAuthenticated,)
-    # def put(self, request, pk, format=None):
-    #     order = OrderModel.objects.get(pk=pk)
-    #     serializer = OrderSerializer(order, data=request.DATA)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    permission_classes = (permissions.IsAuthenticated,)
+    def put(self, request, pk, format=None):
+        order = OrderModel.objects.get(pk=pk)
+        serializer = OrderSerializer(order, data=request.DATA)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # permission_classes = (permissions.IsAuthenticated,)
-    # def delete(self, request, pk, format=None):
-    #     order = OrderModel.objects.get(pk=pk)
-    #     order.delete()
-    #     return Response(status=status.HTTP_204_NO_CONTENT)
+    permission_classes = (permissions.IsAuthenticated,)
+    def delete(self, request, pk, format=None):
+        order = OrderModel.objects.get(pk=pk)
+        order.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

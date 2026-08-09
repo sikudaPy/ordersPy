@@ -51,9 +51,12 @@ class ItemDialog(QDialog):
 
         #buttons       
         layoutButtons = QHBoxLayout()
+        self.write_btn = QPushButton("Записать")
+        layoutButtons.addWidget(self.write_btn, alignment= Qt.AlignmentFlag.AlignLeft)
+        self.write_btn.clicked.connect(self.write)
         self.close_btn = QPushButton("Закрыть")
         layoutButtons.addWidget(self.close_btn, alignment= Qt.AlignmentFlag.AlignRight)
-        self.close_btn.clicked.connect(self.reject)
+        self.close_btn.clicked.connect(self.close)
         layout.addLayout(layoutButtons)
 
         self.setLayout(layout)
@@ -118,6 +121,15 @@ class ItemDialog(QDialog):
             self.layout().addWidget(QLabel(error_str))   
 
         self.reply.deleteLater()
+
+    def write(self):
+        url = QUrl("http://127.0.0.1:8000/orders-api/"+id+"/?format=json")      
+        #url = QUrl("https://orders.python1c.ru/orders-api/"+id+"/?format=json")
+        request = QNetworkRequest(url)
+        encoded_credentials = base64.b64encode(credentials.encode('utf-8')).decode('utf-8')
+        request.setRawHeader(b"Authorization", f"Basic {encoded_credentials}".encode('utf-8'))
+        self.reply = self.network_manager.put(request)
+        self.close()    
 
 class TableModel(QtCore.QAbstractTableModel):
     def __init__(self, data):
