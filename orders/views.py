@@ -1,3 +1,6 @@
+import json
+import uuid
+
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.template import loader
@@ -164,14 +167,14 @@ class OrdersListAPI(APIView):
          serializer = OrderListSerializer(articles, many=True)
          return Response(serializer.data)
 
-    # def post(self, request, format=None):
-    #     serializer = OrderSerializer(data=request.data)
-    #     # if serializer.uuid == "":
-    #     #     serializer.uuid = uuid.uuid4()
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request, format=None):
+        serializer = OrderSerializer(data=request.data)
+        if serializer.uuid == "":
+            serializer.uuid = uuid.uuid4()
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class OrdersAPI(APIView):

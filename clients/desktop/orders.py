@@ -123,12 +123,23 @@ class ItemDialog(QDialog):
         self.reply.deleteLater()
 
     def write(self):
-        url = QUrl("http://127.0.0.1:8000/orders-api/"+id+"/?format=json")      
+        url = QUrl("http://127.0.0.1:8000/orders-api/")      
+        #url = QUrl("https://orders.python1c.ru/orders-api/"+id+"/?format=json")
+        #url = QUrl("http://127.0.0.1:8000/orders-api/"+id+"/?format=json")      
         #url = QUrl("https://orders.python1c.ru/orders-api/"+id+"/?format=json")
         request = QNetworkRequest(url)
+        request.setHeader(QNetworkRequest.KnownHeaders.ContentTypeHeader, "application/json")
         encoded_credentials = base64.b64encode(credentials.encode('utf-8')).decode('utf-8')
         request.setRawHeader(b"Authorization", f"Basic {encoded_credentials}".encode('utf-8'))
-        self.reply = self.network_manager.put(request)
+        json_data = { "number": "003", 
+          "date": "2026-08-14",
+          "organization": "e8dd41a0-76af-4718-86eb-e30aa6a41934",
+          "org_name": "ООО Рога и копыта",
+          "comment": "Другой заказ",
+          "summa": "543.00",
+        }
+        # data = QueryDict("data", json_data )
+        self.reply = self.network_manager.post(request, QByteArray(json_data))
         self.close()    
 
 class TableModel(QtCore.QAbstractTableModel):
