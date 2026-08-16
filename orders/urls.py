@@ -32,6 +32,8 @@ urlpatterns = [
     path('orders-api/', views.OrdersListAPI.as_view(), name='article-api'),
     path('orders-api/<pk>/', views.OrdersAPI.as_view(), name='article-api'),
 
+    path('orders-api/test/<pk>', views.OrdersAPITest.as_view(), name='article-api'),
+    
     #path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     #path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),   
 ]

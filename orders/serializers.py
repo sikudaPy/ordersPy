@@ -25,9 +25,11 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderModel
-        fields = ['uuid', 'number', 'date', 'organization', 'org_name', 'comment', 'summa', 'table']  
+        fields = ['uuid', 'number', 'date', 'organization', 'org_name', 'comment', 'summa', 'table'] 
+        # extra_kwargs = {'table': {'required': False}}
+ 
 
-#Spesial serialize for all data
+#Special serialize for all data
 class OrderDialogSerializer(serializers.ModelSerializer):
     table = OrderAssortmentTableSerializer(many=True)  # Вложенный сериализатор
     org_name = serializers.StringRelatedField(source='organization')

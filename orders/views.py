@@ -199,3 +199,13 @@ class OrdersAPI(APIView):
         order = OrderModel.objects.get(pk=pk)
         order.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class OrdersAPITest(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    def get(self, request, pk, format=None):
+        order = OrderModel.objects.get(pk=pk)
+        serializer = OrderSerializer(order, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
