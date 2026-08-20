@@ -21,12 +21,23 @@ class OrderAssortmentTableSerializer(serializers.ModelSerializer):
           
 class OrderSerializer(serializers.ModelSerializer):
     table = OrderAssortmentTableSerializer(many=True)  # Вложенный сериализатор
-    org_name = serializers.StringRelatedField(source='organization')
 
     class Meta:
         model = OrderModel
-        fields = ['uuid', 'number', 'date', 'organization', 'org_name', 'comment', 'summa', 'table'] 
-        # extra_kwargs = {'table': {'required': False}}
+        fields = ['uuid', 'number', 'date', 'organization', 'comment', 'summa', 'table'] 
+
+    def create(self, validated_data):
+    #     # links_data = validated_data.pop('table')  # Извлекаем вложенные данные
+        od = OrderModel(
+        number = validated_data["number"],
+        date = validated_data["date"],
+        organization = validated_data["organization"],
+        comment = validated_data["comment"],
+        summa = validated_data["summa"])
+        # worksuper = OrderModel.objects.create(validated_data)  # Создаём родительский объект
+    #     # for link_data in links_data:
+    #     #     Link.objects.create(worksuper=worksuper, **link_data)  # Создаём связанные объекты
+        return od    
  
 
 #Special serialize for all data

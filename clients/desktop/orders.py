@@ -1,5 +1,6 @@
 import base64
 import sys, json
+import uuid
 from PySide6 import QtCore, QtWidgets
 from PySide6.QtCore import QByteArray, Qt, QDate, QUuid
 from PySide6.QtWidgets import QDialog, QHeaderView, QVBoxLayout, QLabel, QPushButton, QWidget, QHBoxLayout,QDateEdit,QLineEdit,QTextEdit, QMessageBox, QComboBox
@@ -8,6 +9,8 @@ from PySide6.QtCore import QUrl
 
 #local for test
 credentials = "admin:impimp13"
+strBaseUrl = "http://127.0.0.1:8000/orders-api/" 
+# strBaseUrl = "https://orders.python1c.ru/orders-api/"
 
 class ItemDialog(QDialog):
     def __init__(self, network_manager, id):
@@ -65,8 +68,7 @@ class ItemDialog(QDialog):
 
     def start_request(self, id):
 
-        url = QUrl("http://127.0.0.1:8000/orders-api/"+id+"/?format=json")      
-        #url = QUrl("https://orders.python1c.ru/orders-api/"+id+"/?format=json")
+        url = QUrl(strBaseUrl+id+"/?format=json")      
         request = QNetworkRequest(url)
         encoded_credentials = base64.b64encode(credentials.encode('utf-8')).decode('utf-8')
         request.setRawHeader(b"Authorization", f"Basic {encoded_credentials}".encode('utf-8'))
@@ -80,7 +82,6 @@ class ItemDialog(QDialog):
             data = json.loads(text);
             self.data_number.setText(data["number"])
             self.data_date.setDate(QDate.fromString(data["date"], "yyyy-MM-dd"))
-            #self.data_org.setText(data["org_name"])
             for item in data["all_organizations"]:
                 self.data_org.addItem(item['name'], userData=QUuid(item['uuid']))
             org_uuid = QUuid("{"+data["organization"]+"}")
@@ -123,25 +124,20 @@ class ItemDialog(QDialog):
         self.reply.deleteLater()
 
     def write(self):
-        url = QUrl("http://127.0.0.1:8000/orders-api/"+"?format=json")      
-        #url = QUrl("https://orders.python1c.ru/orders-api/"+id+"/?format=json")
-        #url = QUrl("http://127.0.0.1:8000/orders-api/"+id+"/?format=json")      
-        #url = QUrl("https://orders.python1c.ru/orders-api/"+id+"/?format=json")
+        url = QUrl(strBaseUrl+"?format=json")      
         request = QNetworkRequest(url)
         request.setHeader(QNetworkRequest.KnownHeaders.ContentTypeHeader, "application/json")
         encoded_credentials = base64.b64encode(credentials.encode('utf-8')).decode('utf-8')
         request.setRawHeader(b"Authorization", f"Basic {encoded_credentials}".encode('utf-8'))
         # ['uuid', 'number', 'date', 'organization', 'org_name', 'comment', 'summa', 'table']  
-        json_data = { "uuid": "d38a2112-22a9-469a-9112-559d25cd330f",
-          "number": "003", 
+        json_data = { "uuid": str(uuid.uuid4()),
+          "number": self.data_number.text(), 
           "date": "2026-08-16",
-          "organization": "e8dd41a0-76af-4718-86eb-e30aa6a41956",
-          "org_name": "ООО Рога и копыта",
+          "organization": "4edafcf8-e1af-4616-a3c0-7f95b745ed95",
           "comment": "Другой заказ",
           "summa": "543.00",
           "table": []
         }
-        # data = QueryDict("data", json_data )
         json_string = json.dumps(json_data)
         self.reply = self.network_manager.post(request, json_string.encode('utf-8'))
         self.close()    
@@ -238,8 +234,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def start_request(self):
               
-        url = QUrl("http://127.0.0.1:8000/orders-api/?format=json")
-        #url = QUrl("https://orders.python1c.ru/orders-api/?format=json")
+        url = QUrl(strBaseUrl+"?format=json")
         request = QNetworkRequest(url)      
         encoded_credentials = base64.b64encode(credentials.encode('utf-8')).decode('utf-8')
         request.setRawHeader(b"Authorization", f"Basic {encoded_credentials}".encode('utf-8'))
