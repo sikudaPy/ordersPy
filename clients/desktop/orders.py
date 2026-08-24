@@ -13,10 +13,11 @@ strBaseUrl = "http://127.0.0.1:8000/orders-api/"
 # strBaseUrl = "https://orders.python1c.ru/orders-api/"
 
 class ItemDialog(QDialog):
-    def __init__(self, network_manager, id):
+    def __init__(self, network_manager, id=""):
         super().__init__()
         self.setWindowTitle("Пословица")
         self.network_manager = network_manager
+        self.id = id
         
         # Create a layout to hold widgets
         layout = QVBoxLayout()
@@ -63,7 +64,8 @@ class ItemDialog(QDialog):
         layout.addLayout(layoutButtons)
 
         self.setLayout(layout)
-        self.start_request(id)
+        if id != "":
+            self.start_request(id)
         self.setMinimumWidth(600)
 
     def start_request(self, id):
@@ -124,22 +126,21 @@ class ItemDialog(QDialog):
         self.reply.deleteLater()
 
     def write(self):
-        url = QUrl(strBaseUrl+"?format=json")      
+        url = QUrl(strBaseUrl+self.id+"/?format=json")      
         request = QNetworkRequest(url)
         request.setHeader(QNetworkRequest.KnownHeaders.ContentTypeHeader, "application/json")
         encoded_credentials = base64.b64encode(credentials.encode('utf-8')).decode('utf-8')
         request.setRawHeader(b"Authorization", f"Basic {encoded_credentials}".encode('utf-8'))
-        # ['uuid', 'number', 'date', 'organization', 'org_name', 'comment', 'summa', 'table']  
-        json_data = { "uuid": str(uuid.uuid4()),
+        json_data = { "uuid": str(self.id),
           "number": self.data_number.text(), 
-          "date": "2026-08-16",
-          "organization": "4edafcf8-e1af-4616-a3c0-7f95b745ed95",
-          "comment": "Другой заказ",
-          "summa": "543.00",
+          "date": self.data_date.date().toString("yyyy-MM-dd"),
+          "organization": self.data_org.currentIndex(),
+          "comment": self.data_comment.toPlainText(),
+          "summa": "0.00",
           "table": []
         }
         json_string = json.dumps(json_data)
-        self.reply = self.network_manager.post(request, json_string.encode('utf-8'))
+        self.reply = self.network_manager.put(request, json_string.encode('utf-8'))
         self.close()    
 
 class TableModel(QtCore.QAbstractTableModel):

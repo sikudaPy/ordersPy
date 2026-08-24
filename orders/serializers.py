@@ -27,17 +27,11 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = ['uuid', 'number', 'date', 'organization', 'comment', 'summa', 'table'] 
 
     def create(self, validated_data):
-    #     # links_data = validated_data.pop('table')  # Извлекаем вложенные данные
-        od = OrderModel(
-        number = validated_data["number"],
-        date = validated_data["date"],
-        organization = validated_data["organization"],
-        comment = validated_data["comment"],
-        summa = validated_data["summa"])
-        # worksuper = OrderModel.objects.create(validated_data)  # Создаём родительский объект
-    #     # for link_data in links_data:
-    #     #     Link.objects.create(worksuper=worksuper, **link_data)  # Создаём связанные объекты
-        return od    
+        table_data = validated_data.pop('table')  # Убираем вложенные данные
+        order = OrderModel.objects.create(**validated_data)
+        for line_data in table_data:
+            OrderAssortmentTableModel.objects.create(order=order, **line_data)  
+        return order   
  
 
 #Special serialize for all data
