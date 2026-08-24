@@ -189,7 +189,7 @@ class OrdersAPI(APIView):
     permission_classes = (permissions.IsAuthenticated,)
     def put(self, request, pk, format=None):
         order = OrderModel.objects.get(pk=pk)
-        serializer = OrderSerializer(order, data=request.DATA)
+        serializer = OrderSerializer(order, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

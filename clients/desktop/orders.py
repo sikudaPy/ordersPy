@@ -126,7 +126,10 @@ class ItemDialog(QDialog):
         self.reply.deleteLater()
 
     def write(self):
-        url = QUrl(strBaseUrl+self.id+"/?format=json")      
+        if self.id == "":
+            url = QUrl(strBaseUrl+self.id+"/?format=json") 
+        else:    
+            url = QUrl(strBaseUrl+self.id+"/?format=json")      
         request = QNetworkRequest(url)
         request.setHeader(QNetworkRequest.KnownHeaders.ContentTypeHeader, "application/json")
         encoded_credentials = base64.b64encode(credentials.encode('utf-8')).decode('utf-8')
@@ -134,13 +137,16 @@ class ItemDialog(QDialog):
         json_data = { "uuid": str(self.id),
           "number": self.data_number.text(), 
           "date": self.data_date.date().toString("yyyy-MM-dd"),
-          "organization": self.data_org.currentIndex(),
+          "organization": self.data_org.itemData(self.data_org.currentIndex()).toString(),
           "comment": self.data_comment.toPlainText(),
           "summa": "0.00",
           "table": []
         }
         json_string = json.dumps(json_data)
-        self.reply = self.network_manager.put(request, json_string.encode('utf-8'))
+        if self.id == "":
+            self.reply = self.network_manager.post(request, json_string.encode('utf-8'))
+        else:       
+            self.reply = self.network_manager.put(request, json_string.encode('utf-8'))
         self.close()    
 
 class TableModel(QtCore.QAbstractTableModel):
