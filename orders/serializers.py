@@ -31,7 +31,19 @@ class OrderSerializer(serializers.ModelSerializer):
         order = OrderModel.objects.create(**validated_data)
         for line_data in table_data:
             OrderAssortmentTableModel.objects.create(order=order, **line_data)  
-        return order   
+        return order 
+      
+    def update(self, instance, validated_data):
+        table_data = validated_data.pop('table')  # Убираем вложенные данные
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        # if table_data is not None:
+        #     instance.table.all().delete()  # Удаляем старые метки
+        #     for line_data in table_data:
+        #         instance.table.create(name=line_data)  # Создаем новые метки
+
+        return instance      
  
 
 #Special serialize for all data
