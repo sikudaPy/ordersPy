@@ -96,7 +96,6 @@ class ItemDialog(QDialog):
             self.table.setRowCount(len(table))
             index = 0
             for item in table:
-                #self.table.setItem(index, 0, QtWidgets.QTableWidgetItem(item["assortment"]))
                 asrt_combo = QComboBox()
                 for asrt in data["all_assortment"]:
                     asrt_combo.addItem(asrt['name'], userData=QUuid(asrt['uuid']))
@@ -134,13 +133,28 @@ class ItemDialog(QDialog):
         request.setHeader(QNetworkRequest.KnownHeaders.ContentTypeHeader, "application/json")
         encoded_credentials = base64.b64encode(credentials.encode('utf-8')).decode('utf-8')
         request.setRawHeader(b"Authorization", f"Basic {encoded_credentials}".encode('utf-8'))
+
+        #table lines
+        table = []
+        for index in range(self.table.rowCount()):            
+            asrt_combo = self.table.cellWidget(index, 0)
+            json_line = {
+                "num": 0,
+                "assortment": asrt_combo.itemData(self.data_org.currentIndex()).toString(),
+                "count": self.table.item(index, 1).text(),
+                "price": self.table.item(index, 2).text(),
+                "summa": self.table.item(index, 3).text(),    
+            }
+            table.append(json_line)
+            index = index + 1        
+
         json_data = { "uuid": str(self.id),
           "number": self.data_number.text(), 
           "date": self.data_date.date().toString("yyyy-MM-dd"),
           "organization": self.data_org.itemData(self.data_org.currentIndex()).toString(),
           "comment": self.data_comment.toPlainText(),
           "summa": "0.00",
-          "table": []
+          "table": table
         }
         json_string = json.dumps(json_data)
         if self.id == "":

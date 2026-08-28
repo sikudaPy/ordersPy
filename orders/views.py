@@ -170,13 +170,9 @@ class OrdersListAPI(APIView):
     def post(self, request, format=None):
         serializer = OrderSerializer(data=request.data)
         if serializer.is_valid():
-            try:
-                serializer.save()
-            except Exception as e:
-                print({e})
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class OrdersAPI(APIView):
     permission_classes = (permissions.IsAuthenticated,)
@@ -191,10 +187,7 @@ class OrdersAPI(APIView):
         order = OrderModel.objects.get(pk=pk)
         serializer = OrderSerializer(order, data=request.data)
         if serializer.is_valid():
-            try:
-                serializer.save()
-            except Exception as e:
-                print({e})
+            serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

@@ -38,11 +38,13 @@ class OrderSerializer(serializers.ModelSerializer):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
-        # if table_data is not None:
-        #     instance.table.all().delete()  # Удаляем старые метки
-        #     for line_data in table_data:
-        #         instance.table.create(name=line_data)  # Создаем новые метки
-
+        if table_data is not None:
+            instance.table.all().delete()  # Удаляем старые метки
+            for line_data in table_data:
+                #try:
+                    instance.table.create(num=0,assortment=line_data['assortment'], count=line_data['count'], price=line_data['price'], summa=line_data['summa'])  
+                #except Exception as e:
+                #    print(e)                        
         return instance      
  
 
