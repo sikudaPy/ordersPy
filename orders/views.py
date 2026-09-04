@@ -177,17 +177,22 @@ class OrdersListAPI(APIView):
 class OrdersAPI(APIView):
     permission_classes = (permissions.IsAuthenticated,)
     def get(self, request, pk, format=None):
-         order = OrderModel.objects.get(pk=pk)
-         #serializer = OrderSerializer(order)
-         serializer = OrderDialogSerializer(order)
-         return Response(serializer.data)
+        if pk == "new":
+            order = OrderModel.objects.create()
+        else:
+            order = OrderModel.objects.get(pk=pk)
+        serializer = OrderDialogSerializer(order)
+        return Response(serializer.data)
 
     permission_classes = (permissions.IsAuthenticated,)
     def put(self, request, pk, format=None):
         order = OrderModel.objects.get(pk=pk)
         serializer = OrderSerializer(order, data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            try:
+                serializer.save()
+            except Exception as e:
+                    print(e)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

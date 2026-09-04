@@ -21,24 +21,27 @@ class ItemDialog(QDialog):
         
         # Create a layout to hold widgets
         layout = QVBoxLayout()
-        layoutNumber = QHBoxLayout()
+        
         self.data_number = QLineEdit("")
+        self.data_number.setMaximumWidth(100)
         self.data_date = QDateEdit()
         self.data_date.setCalendarPopup(True)
         self.data_date.setDisplayFormat("dd.MM.yyyy")
 
-        layoutNumber.addWidget(QLabel("Номер:"))
-        layoutNumber.addWidget(self.data_number)
-        layoutNumber.addWidget(QLabel("Дата:"))
-        layoutNumber.addWidget(self.data_date)
-        layout.addLayout(layoutNumber)
+        layoutNumberDate = QHBoxLayout()
+        layoutNumberDate.addWidget(QLabel("Номер:"), 0, alignment=Qt.AlignmentFlag.AlignLeft)
+        layoutNumberDate.addStretch()
+        layoutNumberDate.addWidget(self.data_number)#, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        layoutNumberDate.addWidget(QLabel("Дата:"), 0, alignment=Qt.AlignmentFlag.AlignLeft)
+        layoutNumberDate.addWidget(self.data_date, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        layout.addLayout(layoutNumberDate)
 
         #organization
         layoutOrg = QHBoxLayout()
-        layoutOrg.addWidget( QLabel("Организация"))
-        self.data_org = QComboBox() #QLineEdit("")
-
-        layoutOrg.addWidget( self.data_org)
+        layoutOrg.addWidget( QLabel("Организация"), 0, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.data_org = QComboBox()
+        self.data_org.setMinimumWidth(300)
+        layoutOrg.addWidget( self.data_org, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         layout.addLayout(layoutOrg)
 
         #comment
@@ -50,6 +53,8 @@ class ItemDialog(QDialog):
         
         self.table = QtWidgets.QTableWidget(0,4)
         self.table.setHorizontalHeaderLabels(["Ассортимент", "Количество","Цена","Сумма"])
+        header = self.table.horizontalHeader()    
+        header.setSectionResizeMode(0, QHeaderView.Stretch)
 
         layout.addWidget(self.table)
 
@@ -61,6 +66,9 @@ class ItemDialog(QDialog):
         self.close_btn = QPushButton("Закрыть")
         layoutButtons.addWidget(self.close_btn, alignment= Qt.AlignmentFlag.AlignRight)
         self.close_btn.clicked.connect(self.close)
+        self.del_btn = QPushButton("Удалить")
+        layoutButtons.addWidget(self.del_btn, alignment= Qt.AlignmentFlag.AlignRight)
+        self.del_btn.clicked.connect(self.delete)
         layout.addLayout(layoutButtons)
 
         self.setLayout(layout)
@@ -161,7 +169,17 @@ class ItemDialog(QDialog):
             self.reply = self.network_manager.post(request, json_string.encode('utf-8'))
         else:       
             self.reply = self.network_manager.put(request, json_string.encode('utf-8'))
-        self.close()    
+        self.close()  
+
+    def delete(self):   
+        url = QUrl(strBaseUrl+self.id+"/?format=json")      
+        request = QNetworkRequest(url)
+        request.setHeader(QNetworkRequest.KnownHeaders.ContentTypeHeader, "application/json")
+        encoded_credentials = base64.b64encode(credentials.encode('utf-8')).decode('utf-8')
+        request.setRawHeader(b"Authorization", f"Basic {encoded_credentials}".encode('utf-8'))
+        self.network_manager.deleteResource(request)
+        self.close()  
+      
 
 class TableModel(QtCore.QAbstractTableModel):
     def __init__(self, data):
@@ -233,19 +251,21 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setWindowTitle("Заказы")
         self._file_menu = self.menuBar().addMenu("&File")
 
-        self.table = QtWidgets.QTableView()
-
         self.centralwidget = QWidget(self)
         self.verticalLayout = QVBoxLayout(self.centralwidget)
         self.findLayout = QHBoxLayout()
         self.verticalLayout.insertLayout(0, self.findLayout)
+        self.findLayout.addWidget(QLabel("Список заказов"), stretch=0, alignment=Qt.AlignmentFlag.AlignBaseline|Qt.AlignmentFlag.AlignLeft)
+        self.createButton = QPushButton("Create")
+        self.findLayout.addWidget(self.createButton, stretch=0, alignment=Qt.AlignmentFlag.AlignTop|Qt.AlignmentFlag.AlignLeft)
+        self.createButton.clicked.connect(self.create_item)
         self.findText = QLineEdit()
         self.findText.setPlaceholderText(" Find text in table ")
-        self.findLayout.addWidget(self.findText, stretch=100, alignment=Qt.AlignmentFlag.AlignTop|Qt.AlignmentFlag.AlignRight)
-        self.findButton = QPushButton(" Find... ")
-        self.findLayout.addWidget(self.findButton, stretch=10, alignment=Qt.AlignmentFlag.AlignTop|Qt.AlignmentFlag.AlignRight)
-        self.findButton.clicked.connect(self.find)
-
+        self.findText.setMinimumWidth(500)
+        self.findLayout.addWidget(self.findText, stretch=1, alignment=Qt.AlignmentFlag.AlignTop|Qt.AlignmentFlag.AlignRight)
+        self.findText.editingFinished.connect(self.find)
+        
+        self.table = QtWidgets.QTableView()
         self.verticalLayout.addWidget(self.table)
         self.setCentralWidget(self.centralwidget)
 
@@ -285,13 +305,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.table.resizeColumnToContents(2)
         header = self.table.horizontalHeader()    
         header.setSectionResizeMode(3, QHeaderView.Stretch)
-        #self.table.resizeColumnToContents(3)
         self.table.resizeColumnToContents(4)
         #self.table.setColumnWidth(1, 600)
         self.table.clicked.connect(self.show_item)
 
-    def show_item(self, index):
+    # @Slot()
+    def create_item(self):
+        dialog = ItemDialog(self.network_manager, "new")
+        dialog.exec()
 
+    def show_item(self, index):
         model = self.table.model()
         indexRec  = model.index(index.row(), 0)
         indexTitle = model.index(index.row(), 1)
