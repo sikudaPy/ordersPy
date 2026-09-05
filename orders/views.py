@@ -163,8 +163,10 @@ def getOrdersByFilter(strFind: str = ""):
 class OrdersListAPI(APIView):
     permission_classes = (permissions.IsAuthenticated,)
     def get(self, request, format=None):
-         articles = OrderModel.objects.all()
-         serializer = OrderListSerializer(articles, many=True)
+         strFind = request.GET.get("strFind") or ""
+         orders = getOrdersByFilter(strFind)
+        #  articles = OrderModel.objects.all()
+         serializer = OrderListSerializer(orders, many=True)
          return Response(serializer.data)
 
     def post(self, request, format=None):

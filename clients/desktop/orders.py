@@ -2,7 +2,7 @@ import base64
 import sys, json
 import uuid
 from PySide6 import QtCore, QtWidgets
-from PySide6.QtCore import QByteArray, Qt, QDate, QUuid
+from PySide6.QtCore import QByteArray, QModelIndex, Qt, QDate, QUuid
 from PySide6.QtWidgets import QDialog, QHeaderView, QVBoxLayout, QLabel, QPushButton, QWidget, QHBoxLayout,QDateEdit,QLineEdit,QTextEdit, QMessageBox, QComboBox
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
 from PySide6.QtCore import QUrl
@@ -13,8 +13,8 @@ strBaseUrl = "http://127.0.0.1:8000/orders-api/"
 # strBaseUrl = "https://orders.python1c.ru/orders-api/"
 
 class ItemDialog(QDialog):
-    def __init__(self, network_manager, id=""):
-        super().__init__()
+    def __init__(self, parent=None, network_manager=None, id=""):
+        super().__init__(parent)
         self.setWindowTitle("Пословица")
         self.network_manager = network_manager
         self.id = id
@@ -76,6 +76,14 @@ class ItemDialog(QDialog):
             self.start_request(id)
         self.setMinimumWidth(600)
 
+    # def closeEvent(self, event):
+    #     parent = self.parentWidget()
+    #     if parent:
+    #         parent.start_request()
+            
+    #     # Allow the dialog to close normally
+    #     event.accept()    
+
     def start_request(self, id):
 
         url = QUrl(strBaseUrl+id+"/?format=json")      
@@ -94,10 +102,11 @@ class ItemDialog(QDialog):
             self.data_date.setDate(QDate.fromString(data["date"], "yyyy-MM-dd"))
             for item in data["all_organizations"]:
                 self.data_org.addItem(item['name'], userData=QUuid(item['uuid']))
-            org_uuid = QUuid("{"+data["organization"]+"}")
-            index = self.data_org.findData(org_uuid)
-            if index != -1:
-                self.data_org.setCurrentIndex(index)
+            if data["organization"]:    
+                org_uuid = QUuid("{"+data["organization"]+"}")
+                index = self.data_org.findData(org_uuid)
+                if index != -1:
+                    self.data_org.setCurrentIndex(index)
     
             self.data_comment.setText(data["comment"])
             table = data["table"]
@@ -165,11 +174,13 @@ class ItemDialog(QDialog):
           "table": table
         }
         json_string = json.dumps(json_data)
-        if self.id == "":
-            self.reply = self.network_manager.post(request, json_string.encode('utf-8'))
+        if self.id == "":#do not used
+            self.network_manager.post(request, json_string.encode('utf-8'))
         else:       
-            self.reply = self.network_manager.put(request, json_string.encode('utf-8'))
-        self.close()  
+            self.network_manager.put(request, json_string.encode('utf-8'))
+ 
+        self.close() 
+        self.parent().set_item(json_data)        
 
     def delete(self):   
         url = QUrl(strBaseUrl+self.id+"/?format=json")      
@@ -178,8 +189,8 @@ class ItemDialog(QDialog):
         encoded_credentials = base64.b64encode(credentials.encode('utf-8')).decode('utf-8')
         request.setRawHeader(b"Authorization", f"Basic {encoded_credentials}".encode('utf-8'))
         self.network_manager.deleteResource(request)
-        self.close()  
-      
+        self.close()
+        self.parent().del_item(self.id) 
 
 class TableModel(QtCore.QAbstractTableModel):
     def __init__(self, data):
@@ -275,7 +286,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def start_request(self):
               
-        url = QUrl(strBaseUrl+"?format=json")
+        url = QUrl(strBaseUrl+"?format=json&strFind="+self.findText.text())
         request = QNetworkRequest(url)      
         encoded_credentials = base64.b64encode(credentials.encode('utf-8')).decode('utf-8')
         request.setRawHeader(b"Authorization", f"Basic {encoded_credentials}".encode('utf-8'))
@@ -311,24 +322,42 @@ class MainWindow(QtWidgets.QMainWindow):
 
     # @Slot()
     def create_item(self):
-        dialog = ItemDialog(self.network_manager, "new")
+        dialog = ItemDialog(self, self.network_manager, "new")
         dialog.exec()
 
     def show_item(self, index):
         model = self.table.model()
         indexRec  = model.index(index.row(), 0)
-        indexTitle = model.index(index.row(), 1)
+        #indexTitle = model.index(index.row(), 1)
         id = model.data(indexRec, Qt.EditRole)
-        dialog = ItemDialog(self.network_manager, id)
+        dialog = ItemDialog(self, self.network_manager, id)
         dialog.exec()
+
+    def del_item(self, uuid):        
+            model = self.table.model()
+            for row, item in enumerate(model.catalogs,start=0):
+                if item["uuid"] == uuid:
+                    model.beginRemoveRows(QModelIndex(),row,row)
+                    model.catalogs.remove(item) 
+                    model.endRemoveRows() 
+                    break
+
+    def set_item(self, json_data): 
+        model = self.table.model()
+        for item in model.catalogs:
+            if item["uuid"] == json_data["uuid"]:
+                item.update(json_data)
+                break
+        self.table.update               
 
     # @Slot()
     def find(self):
-        findString = self.findText.text()
-        dlg = QMessageBox(self)
-        dlg.setWindowTitle(self.tr("Заказ"))
-        dlg.setText(self.tr("text: '"+findString+"' будет найден"))
-        dlg.exec()
+        # findString = self.findText.text()
+        self.start_request()
+        # dlg = QMessageBox(self)
+        # dlg.setWindowTitle(self.tr("Заказ"))
+        # dlg.setText(self.tr("text: '"+findString+"' будет найден"))
+        # dlg.exec()
 
 
 app = QtWidgets.QApplication(sys.argv)
