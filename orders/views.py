@@ -180,7 +180,7 @@ class OrdersAPI(APIView):
     permission_classes = (permissions.IsAuthenticated,)
     def get(self, request, pk, format=None):
         if pk == "new":
-            order = OrderModel.objects.create()
+            order = OrderModel()#.objects.create()
         else:
             order = OrderModel.objects.get(pk=pk)
         serializer = OrderDialogSerializer(order)
