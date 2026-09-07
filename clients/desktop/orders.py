@@ -2,10 +2,10 @@ import base64
 import sys, json
 import uuid
 from PySide6 import QtCore, QtWidgets
-from PySide6.QtCore import QByteArray, QModelIndex, Qt, QDate, QUuid
-from PySide6.QtWidgets import QDialog, QHeaderView, QVBoxLayout, QLabel, QPushButton, QWidget, QHBoxLayout,QDateEdit,QLineEdit,QTextEdit, QMessageBox, QComboBox
+from PySide6.QtCore import QUrl, QModelIndex, Qt, QDate, QUuid
+from PySide6.QtWidgets import QDialog, QDoubleSpinBox, QHeaderView, QSpinBox, QVBoxLayout, QLabel, QPushButton, QWidget, QHBoxLayout,QDateEdit,QLineEdit,QTextEdit, QMessageBox, QComboBox
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
-from PySide6.QtCore import QUrl
+from PySide6.QtGui import QDoubleValidator
 
 #local for test
 credentials = "admin:impimp13"
@@ -15,7 +15,7 @@ strBaseUrl = "http://127.0.0.1:8000/orders-api/"
 class ItemDialog(QDialog):
     def __init__(self, parent=None, network_manager=None, id=""):
         super().__init__(parent)
-        self.setWindowTitle("Пословица")
+        self.setWindowTitle("Заказ")
         self.network_manager = network_manager
         self.id = id
         
@@ -30,10 +30,11 @@ class ItemDialog(QDialog):
 
         layoutNumberDate = QHBoxLayout()
         layoutNumberDate.addWidget(QLabel("Номер:"), 0, alignment=Qt.AlignmentFlag.AlignLeft)
-        layoutNumberDate.addStretch()
+        #layoutNumberDate.addStretch()
         layoutNumberDate.addWidget(self.data_number)#, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         layoutNumberDate.addWidget(QLabel("Дата:"), 0, alignment=Qt.AlignmentFlag.AlignLeft)
         layoutNumberDate.addWidget(self.data_date, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        layoutNumberDate.setSpacing(10)
         layout.addLayout(layoutNumberDate)
 
         #organization
@@ -56,7 +57,18 @@ class ItemDialog(QDialog):
         header = self.table.horizontalHeader()    
         header.setSectionResizeMode(0, QHeaderView.Stretch)
 
-        layout.addWidget(self.table)
+        tableLayout = QVBoxLayout()
+        commandLayout = QHBoxLayout()
+        addButton = QPushButton("Добавить")
+        commandLayout.addWidget(addButton,0,alignment=Qt.AlignmentFlag.AlignLeft) 
+        addButton.clicked.connect(self.add_line)
+        delButton = QPushButton("Удалить")
+        commandLayout.addWidget(delButton,1,alignment=Qt.AlignmentFlag.AlignLeft) 
+        delButton.clicked.connect(self.del_line)
+        tableLayout.addLayout(commandLayout)
+        tableLayout.addWidget(self.table)
+        tableLayout.setSpacing(0)
+        layout.addLayout(tableLayout)
 
         #buttons       
         layoutButtons = QHBoxLayout()
@@ -64,7 +76,7 @@ class ItemDialog(QDialog):
         layoutButtons.addWidget(self.write_btn, alignment= Qt.AlignmentFlag.AlignLeft)
         self.write_btn.clicked.connect(self.write)
         self.close_btn = QPushButton("Закрыть")
-        layoutButtons.addWidget(self.close_btn, alignment= Qt.AlignmentFlag.AlignRight)
+        layoutButtons.addWidget(self.close_btn, alignment= Qt.AlignmentFlag.AlignHCenter)
         self.close_btn.clicked.connect(self.close)
         self.del_btn = QPushButton("Удалить")
         layoutButtons.addWidget(self.del_btn, alignment= Qt.AlignmentFlag.AlignRight)
@@ -74,15 +86,7 @@ class ItemDialog(QDialog):
         self.setLayout(layout)
         if id != "":
             self.start_request(id)
-        self.setMinimumWidth(600)
-
-    # def closeEvent(self, event):
-    #     parent = self.parentWidget()
-    #     if parent:
-    #         parent.start_request()
-            
-    #     # Allow the dialog to close normally
-    #     event.accept()    
+        self.setMinimumWidth(600)   
 
     def start_request(self, id):
 
@@ -112,9 +116,10 @@ class ItemDialog(QDialog):
             table = data["table"]
             self.table.setRowCount(len(table))
             index = 0
+            self.asrt_list = data["all_assortment"].copy()
             for item in table:
                 asrt_combo = QComboBox()
-                for asrt in data["all_assortment"]:
+                for asrt in self.asrt_list: #data["all_assortment"]:
                     asrt_combo.addItem(asrt['name'], userData=QUuid(asrt['uuid']))
                 asrt_uuid = QUuid("{"+item["assortment"]+"}")
                 index_asrt = asrt_combo.findData(asrt_uuid)
@@ -122,15 +127,24 @@ class ItemDialog(QDialog):
                     asrt_combo.setCurrentIndex(index_asrt)
                 self.table.setCellWidget(index, 0, asrt_combo)
 
-                itemCount = QtWidgets.QTableWidgetItem(item["count"])
-                itemCount.setTextAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignRight)
-                self.table.setItem(index, 1, itemCount)
-                itemPrice = QtWidgets.QTableWidgetItem(item["price"])
-                itemPrice.setTextAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignRight)
-                self.table.setItem(index, 2, itemPrice)
-                itemCount = QtWidgets.QTableWidgetItem(item["summa"])
-                itemCount.setTextAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignRight)
-                self.table.setItem(index, 3, itemCount)
+                itemCount = QSpinBox(minimum=0, maximum=100000000,value=int(item["count"]))
+                self.table.setCellWidget(index, 1, itemCount)
+                itemCount.setAlignment(Qt.AlignmentFlag.AlignRight)
+                # itemCount = QtWidgets.QTableWidgetItem(item["count"])
+                # # itemCount.setData(QtCore.Qt.EditRole, 5)
+                # itemCount.setTextAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignRight)
+                # self.table.setItem(index, 1, itemCount)
+                
+                itemPrice = QDoubleSpinBox(minimum=0, maximum=100000000,value=float(item["price"]))
+                self.table.setCellWidget(index, 2, itemPrice)
+                itemPrice.setAlignment(Qt.AlignmentFlag.AlignRight)
+
+                itemPrice = QDoubleSpinBox(minimum=0, maximum=100000000,value=float(item["summa"]))
+                self.table.setCellWidget(index, 3, itemPrice)
+                itemPrice.setAlignment(Qt.AlignmentFlag.AlignRight)
+                # itemCount = QtWidgets.QTableWidgetItem(item["summa"])
+                # itemCount.setTextAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignRight)
+                # self.table.setItem(index, 3, itemCount)
                 index = index + 1
 
             self.table.resizeColumnToContents(0)
@@ -140,6 +154,32 @@ class ItemDialog(QDialog):
             self.layout().addWidget(QLabel(error_str))   
 
         self.reply.deleteLater()
+
+    def add_line(self):
+        index = self.table.rowCount()
+        self.table.insertRow(index)
+        asrt_combo = QComboBox()
+        for asrt in self.asrt_list: 
+            asrt_combo.addItem(asrt['name'], userData=QUuid(asrt['uuid']))
+        self.table.setCellWidget(index, 0, asrt_combo)
+
+        itemCount = QSpinBox(minimum=0, maximum=100000000,value=0)
+        self.table.setCellWidget(index, 1, itemCount)
+        itemCount.setAlignment(Qt.AlignmentFlag.AlignRight)
+                
+        itemPrice = QDoubleSpinBox(minimum=0, maximum=100000000,value=0)
+        self.table.setCellWidget(index, 2, itemPrice)
+        itemPrice.setAlignment(Qt.AlignmentFlag.AlignRight)
+
+        itemPrice = QDoubleSpinBox(minimum=0, maximum=100000000,value=0)
+        self.table.setCellWidget(index, 3, itemPrice)
+        itemPrice.setAlignment(Qt.AlignmentFlag.AlignRight)
+
+
+    def del_line(self):
+        row = self.table.currentRow()
+        if row >= 0:
+            self.table.removeRow(row)  
 
     def write(self):
         if self.id == "":
@@ -158,9 +198,9 @@ class ItemDialog(QDialog):
             json_line = {
                 "num": 0,
                 "assortment": asrt_combo.itemData(self.data_org.currentIndex()).toString(),
-                "count": self.table.item(index, 1).text(),
-                "price": self.table.item(index, 2).text(),
-                "summa": self.table.item(index, 3).text(),    
+                "count": self.table.cellWidget(index, 1).text().replace(",", "."),
+                "price": self.table.cellWidget(index, 2).text().replace(",", "."),
+                "summa": self.table.cellWidget(index, 3).text().replace(",", "."),    
             }
             table.append(json_line)
             index = index + 1        
@@ -275,7 +315,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.findText.setMinimumWidth(500)
         self.findLayout.addWidget(self.findText, stretch=1, alignment=Qt.AlignmentFlag.AlignTop|Qt.AlignmentFlag.AlignRight)
         self.findText.editingFinished.connect(self.find)
-        
+
         self.table = QtWidgets.QTableView()
         self.verticalLayout.addWidget(self.table)
         self.setCentralWidget(self.centralwidget)
