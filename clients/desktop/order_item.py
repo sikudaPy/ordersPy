@@ -1,5 +1,6 @@
 import base64
 import json
+import uuid
 
 from PySide6 import QtWidgets
 from PySide6.QtCore import QUrl, Qt, QDate, QUuid
@@ -97,7 +98,7 @@ class ItemDialog(QDialog):
         if self.reply.error() == QNetworkReply.NetworkError.NoError:
             # Читаем данные
             text = self.reply.readAll().data().decode("utf-8")
-            data = json.loads(text);
+            data = json.loads(text)
             self.data_number.setText(data["number"])
             self.data_date.setDate(QDate.fromString(data["date"], "yyyy-MM-dd"))
             for item in data["all_organizations"]:
@@ -212,7 +213,6 @@ class ItemDialog(QDialog):
             index = index + 1        
 
         json_data = { 
-          # "uuid": str(self.id),
           "number": self.data_number.text(), 
           "date": self.data_date.date().toString("yyyy-MM-dd"),
           "organization": self.data_org.itemData(self.data_org.currentIndex()).toString(),
@@ -220,20 +220,24 @@ class ItemDialog(QDialog):
           "summa": str(summa),
           "table": table
         }
+        if self.id != "new":
+            json_data["uuid"] =  str(self.id)
         json_string = json.dumps(json_data)
-        if self.id == "new":#do not used
+        if self.id == "new":
             request = getRequestAuth("?format=json")
             self.network_manager.post(request, json_string.encode('utf-8'))
+            # self.parent().add_item(json_data)
         else:       
             request = getRequestAuth(self.id+"/?format=json")
             self.network_manager.put(request, json_string.encode('utf-8'))
- 
-        self.close() 
-        self.parent().find() #set_item(json_data)        
+            # self.parent().set_item(json_data)
+        self.close()
+        self.parent().find() 
+                
 
     def delete(self): 
         request = getRequestAuth(self.id+"/?format=json")  
         self.network_manager.deleteResource(request)
         self.close()
-        self.parent().find()
         # self.parent().del_item(self.id) 
+        self.parent().find()

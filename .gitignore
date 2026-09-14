@@ -10,6 +10,8 @@ media
 
 # Backup files # 
 *.bak 
+build
+.DS_Store
 
 # If you are using PyCharm # 
 # User-specific stuff

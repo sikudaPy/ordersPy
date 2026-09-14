@@ -155,18 +155,24 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def set_item(self, json_data): 
         model = self.table.model()
-        if "uuid" in json_data.keys():
-            for item in model.catalogs:
-                if item["uuid"] == json_data["uuid"]:
-                    item.update(json_data)
-                    break
-        else:
-            self.start_request()  
-        self.table.update          
+        for item in model.catalogs:
+            if item["uuid"] == json_data["uuid"]:
+                item.update(json_data)
+                break 
+        self.table.update  
+
+    def add_item(self, json_data): 
+        # model = self.table.model()
+        # row_position = len(model.catalogs)
+        # model.beginInsertRows(QModelIndex(), row_position, row_position)
+        # model.catalogs.append(json_data)
+        # model.endInsertRows() 
+        self.table.update        
 
     # @Slot()
     def find(self):
         self.start_request()
+        self.table.update
 
 
 app = QtWidgets.QApplication(sys.argv)

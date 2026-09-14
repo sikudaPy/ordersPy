@@ -165,10 +165,10 @@ class OrdersListAPI(APIView):
     def get(self, request, format=None):
         strFind = request.GET.get("strFind") or ""
         orders = getOrdersByFilter(strFind)
-        #articles = OrderModel.objects.all()
         serializer = OrderListSerializer(orders, many=True)
         return Response(serializer.data)
 
+    permission_classes = (permissions.IsAuthenticated,)
     def post(self, request, format=None):
         serializer = OrderSerializer(data=request.data)
         if serializer.is_valid():
