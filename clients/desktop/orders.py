@@ -97,6 +97,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.verticalLayout.addWidget(self.table)
         self.setCentralWidget(self.centralwidget)
 
+        self.table.setAlternatingRowColors(True)    
+        #self.table.setColumnWidth(1, 600)
+        self.table.clicked.connect(self.show_item)
+
         # Инициализация менеджера сети
         self.network_manager = QNetworkAccessManager(self)
         self.start_request()
@@ -119,16 +123,13 @@ class MainWindow(QtWidgets.QMainWindow):
             self.table.setModel(TableModel(str_catalog))
             
         self.reply.deleteLater()
-     
-        self.table.setAlternatingRowColors(True)
         self.table.resizeColumnToContents(0)
         self.table.resizeColumnToContents(1)
         self.table.resizeColumnToContents(2)
         header = self.table.horizontalHeader()    
         header.setSectionResizeMode(3, QHeaderView.Stretch)
-        self.table.resizeColumnToContents(4)
-        #self.table.setColumnWidth(1, 600)
-        self.table.clicked.connect(self.show_item)
+        #self.table.resizeColumnToContents(4)
+        #self.table.update       
 
     # @Slot()
     def create_item(self):
@@ -154,11 +155,14 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def set_item(self, json_data): 
         model = self.table.model()
-        for item in model.catalogs:
-            if item["uuid"] == json_data["uuid"]:
-                item.update(json_data)
-                break
-        self.table.update               
+        if "uuid" in json_data.keys():
+            for item in model.catalogs:
+                if item["uuid"] == json_data["uuid"]:
+                    item.update(json_data)
+                    break
+        else:
+            self.start_request()  
+        self.table.update          
 
     # @Slot()
     def find(self):

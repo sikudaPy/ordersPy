@@ -83,7 +83,7 @@ class ItemDialog(QDialog):
         layout.addLayout(layoutButtons)
 
         self.setLayout(layout)
-        #if id != "":
+        #if id != "new":
         self.start_request(id)
         self.setMinimumWidth(600)   
 
@@ -195,7 +195,6 @@ class ItemDialog(QDialog):
             self.table.removeRow(row)  
 
     def write(self):
-        request = getRequestAuth(self.id+"/?format=json")
         #table lines
         table = []
         summa = 0
@@ -212,7 +211,8 @@ class ItemDialog(QDialog):
             table.append(json_line)
             index = index + 1        
 
-        json_data = { "uuid": str(self.id),
+        json_data = { 
+          # "uuid": str(self.id),
           "number": self.data_number.text(), 
           "date": self.data_date.date().toString("yyyy-MM-dd"),
           "organization": self.data_org.itemData(self.data_org.currentIndex()).toString(),
@@ -221,16 +221,19 @@ class ItemDialog(QDialog):
           "table": table
         }
         json_string = json.dumps(json_data)
-        if self.id == "":#do not used
+        if self.id == "new":#do not used
+            request = getRequestAuth("?format=json")
             self.network_manager.post(request, json_string.encode('utf-8'))
         else:       
+            request = getRequestAuth(self.id+"/?format=json")
             self.network_manager.put(request, json_string.encode('utf-8'))
  
         self.close() 
-        self.parent().set_item(json_data)        
+        self.parent().find() #set_item(json_data)        
 
     def delete(self): 
         request = getRequestAuth(self.id+"/?format=json")  
         self.network_manager.deleteResource(request)
         self.close()
-        self.parent().del_item(self.id) 
+        self.parent().find()
+        # self.parent().del_item(self.id) 
