@@ -21,7 +21,7 @@ class ItemDialog(QDialog):
         
         self.data_number = QLineEdit("")
         self.data_number.setMaximumWidth(100)
-        self.data_date = QDateEdit()
+        self.data_date = QDateEdit(self,date = QDate.currentDate())
         self.data_date.setCalendarPopup(True)
         self.data_date.setDisplayFormat("dd.MM.yyyy")
 
@@ -55,11 +55,13 @@ class ItemDialog(QDialog):
 
         tableLayout = QVBoxLayout()
         commandLayout = QHBoxLayout()
-        addButton = QPushButton("+")
+        addButton = QPushButton("Добавить строку")
+        addButton.setStyleSheet("QPushButton { background-color: #198754; color: white; }")
         commandLayout.addWidget(addButton,0,alignment=Qt.AlignmentFlag.AlignLeft) 
         addButton.clicked.connect(self.add_line)
-        delButton = QPushButton("-")
-        commandLayout.addWidget(delButton,0,alignment=Qt.AlignmentFlag.AlignLeft) 
+        delButton = QPushButton("Удалить строку")
+        delButton.setStyleSheet("QPushButton { background-color: #dc3545; color: white; }")
+        commandLayout.addWidget(delButton,1,alignment=Qt.AlignmentFlag.AlignRight) 
         delButton.clicked.connect(self.del_line)
         # copyButton = QPushButton("++")
         # commandLayout.addWidget(copyButton,0,alignment=Qt.AlignmentFlag.AlignLeft) 
@@ -72,15 +74,18 @@ class ItemDialog(QDialog):
 
         #buttons       
         layoutButtons = QHBoxLayout()
-        self.write_btn = QPushButton("Записать")
-        layoutButtons.addWidget(self.write_btn, alignment= Qt.AlignmentFlag.AlignLeft)
-        self.write_btn.clicked.connect(self.write)
-        self.close_btn = QPushButton("Закрыть")
-        layoutButtons.addWidget(self.close_btn, alignment= Qt.AlignmentFlag.AlignHCenter)
-        self.close_btn.clicked.connect(self.close)
-        self.del_btn = QPushButton("Удалить")
-        layoutButtons.addWidget(self.del_btn, alignment= Qt.AlignmentFlag.AlignRight)
-        self.del_btn.clicked.connect(self.delete)
+        write_btn = QPushButton("Записать")
+        write_btn.setStyleSheet("QPushButton { background-color: #0d6efd; color: white; }")
+        layoutButtons.addWidget(write_btn, alignment= Qt.AlignmentFlag.AlignLeft)
+        write_btn.clicked.connect(self.write)
+        close_btn = QPushButton("Закрыть")
+        close_btn.setStyleSheet("QPushButton { background-color: #6c757d; color: white; }")           
+        layoutButtons.addWidget(close_btn, alignment= Qt.AlignmentFlag.AlignHCenter)
+        close_btn.clicked.connect(self.close)
+        del_btn = QPushButton("Удалить")
+        del_btn.setStyleSheet("QPushButton { background-color: #dc3545;  color: white;}")
+        layoutButtons.addWidget(del_btn, alignment= Qt.AlignmentFlag.AlignRight)
+        del_btn.clicked.connect(self.delete)
         layout.addLayout(layoutButtons)
 
         self.setLayout(layout)
@@ -180,14 +185,17 @@ class ItemDialog(QDialog):
         itemCount = QSpinBox(minimum=0, maximum=100000000,value=0)
         self.table.setCellWidget(index, 1, itemCount)
         itemCount.setAlignment(Qt.AlignmentFlag.AlignRight)
+        itemCount.valueChanged.connect(self.count_change)
                 
         itemPrice = QDoubleSpinBox(minimum=0, maximum=100000000,value=0)
         self.table.setCellWidget(index, 2, itemPrice)
         itemPrice.setAlignment(Qt.AlignmentFlag.AlignRight)
-
-        itemPrice = QDoubleSpinBox(minimum=0, maximum=100000000,value=0)
-        self.table.setCellWidget(index, 3, itemPrice)
-        itemPrice.setAlignment(Qt.AlignmentFlag.AlignRight)
+        itemPrice.valueChanged.connect(self.price_change)
+        
+        itemSumma = QDoubleSpinBox(minimum=0, maximum=100000000,value=0)
+        self.table.setCellWidget(index, 3, itemSumma)
+        itemSumma.setAlignment(Qt.AlignmentFlag.AlignRight)
+        itemSumma.valueChanged.connect(self.summa_change)
 
 
     def del_line(self):
