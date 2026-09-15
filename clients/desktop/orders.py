@@ -5,7 +5,7 @@ from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QApplication, QMainWindow, QTableView, QHeaderView, QVBoxLayout, QLabel, QPushButton, QWidget, QHBoxLayout, QLineEdit
 from PySide6.QtNetwork import QNetworkAccessManager,  QNetworkReply
 
-from order_const import strBaseUrl, getRequestAuth
+from order_const import  getRequestAuth
 from order_item import ItemDialog
 
 
@@ -13,7 +13,6 @@ class TableModel(QAbstractTableModel):
     def __init__(self): #, data):
         super().__init__()
         self.catalogs = {}
-        #self.catalogs = json.loads(data)
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
@@ -121,10 +120,8 @@ class MainWindow(QMainWindow):
 
     def handle_response(self):
         if self.reply.error() == QNetworkReply.NetworkError.NoError:
-            # Читаем данные
             str_catalog = self.reply.readAll().data().decode("utf-8")
             model = self.table.model()
-            #self.table.setModel(TableModel(str_catalog))
             model.beginResetModel()
             model.catalogs = json.loads(str_catalog)
             model.endResetModel()
@@ -151,35 +148,9 @@ class MainWindow(QMainWindow):
     def show_item(self, index):
         model = self.table.model()
         indexRec  = model.index(index.row(), 0)
-        #indexTitle = model.index(index.row(), 1)
         id = model.data(indexRec, Qt.EditRole)
         dialog = ItemDialog(self, self.network_manager, id)
-        dialog.exec()
-
-    def del_item(self, uuid):        
-            model = self.table.model()
-            for row, item in enumerate(model.catalogs,start=0):
-                if item["uuid"] == uuid:
-                    model.beginRemoveRows(QModelIndex(),row,row)
-                    model.catalogs.remove(item) 
-                    model.endRemoveRows() 
-                    break
-
-    def set_item(self, json_data): 
-        model = self.table.model()
-        for item in model.catalogs:
-            if item["uuid"] == json_data["uuid"]:
-                item.update(json_data)
-                break 
-        self.table.update  
-
-    def add_item(self, json_data): 
-        # model = self.table.model()
-        # row_position = len(model.catalogs)
-        # model.beginInsertRows(QModelIndex(), row_position, row_position)
-        # model.catalogs.append(json_data)
-        # model.endInsertRows() 
-        self.table.update        
+        dialog.exec()       
 
     # @Slot()
     def find(self):

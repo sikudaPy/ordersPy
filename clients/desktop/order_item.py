@@ -204,13 +204,12 @@ class ItemDialog(QDialog):
             self.table.removeRow(row)  
 
     def write(self):
-        #table lines
         table = []
         summa = 0
         for index in range(self.table.rowCount()):            
             asrt_combo = self.table.cellWidget(index, 0)
             json_line = {
-                "num": 0,
+                "num": index,
                 "assortment": asrt_combo.itemData(self.data_org.currentIndex()).toString(),
                 "count": self.table.cellWidget(index, 1).text().replace(",", "."),
                 "price": self.table.cellWidget(index, 2).text().replace(",", "."),
@@ -238,7 +237,6 @@ class ItemDialog(QDialog):
         else:       
             request = getRequestAuth(self.id+"/?format=json")
             self.reply = self.network_manager.put(request, json_string.encode('utf-8'))
-            # self.parent().set_item(json_data)
         self.reply.finished.connect(self.end_write)            
 
     def end_write(self):
@@ -249,6 +247,5 @@ class ItemDialog(QDialog):
     def delete(self): 
         request = getRequestAuth(self.id+"/?format=json")  
         self.network_manager.deleteResource(request)
-        self.close()
-        # self.parent().del_item(self.id) 
+        self.close() 
         self.parent().find()
