@@ -225,15 +225,18 @@ class ItemDialog(QDialog):
         json_string = json.dumps(json_data)
         if self.id == "new":
             request = getRequestAuth("?format=json")
-            self.network_manager.post(request, json_string.encode('utf-8'))
+            self.reply = self.network_manager.post(request, json_string.encode('utf-8'))
             # self.parent().add_item(json_data)
         else:       
             request = getRequestAuth(self.id+"/?format=json")
-            self.network_manager.put(request, json_string.encode('utf-8'))
+            self.reply = self.network_manager.put(request, json_string.encode('utf-8'))
             # self.parent().set_item(json_data)
-        self.close()
-        self.parent().find() 
-                
+        self.reply.finished.connect(self.end_write)            
+
+    def end_write(self):
+        if self.reply.error() == QNetworkReply.NetworkError.NoError:
+            self.parent().find() 
+        self.close()    
 
     def delete(self): 
         request = getRequestAuth(self.id+"/?format=json")  

@@ -1,18 +1,19 @@
 import sys, json
 
-from PySide6 import QtCore, QtWidgets
-from PySide6.QtCore import  QModelIndex, Qt
-from PySide6.QtWidgets import QHeaderView, QVBoxLayout, QLabel, QPushButton, QWidget, QHBoxLayout,QDateEdit,QLineEdit,QTextEdit, QMessageBox, QComboBox
+from PySide6.QtCore import  QModelIndex, QAbstractTableModel, Qt
+from PySide6.QtGui import QAction
+from PySide6.QtWidgets import QApplication, QMainWindow, QTableView, QHeaderView, QVBoxLayout, QLabel, QPushButton, QWidget, QHBoxLayout, QLineEdit
 from PySide6.QtNetwork import QNetworkAccessManager,  QNetworkReply
 
 from order_const import strBaseUrl, getRequestAuth
 from order_item import ItemDialog
 
 
-class TableModel(QtCore.QAbstractTableModel):
-    def __init__(self, data):
+class TableModel(QAbstractTableModel):
+    def __init__(self): #, data):
         super().__init__()
-        self.catalogs = json.loads(data)
+        self.catalogs = {}
+        #self.catalogs = json.loads(data)
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
@@ -73,11 +74,15 @@ class TableModel(QtCore.QAbstractTableModel):
     def columnCount(self, index):
         return 5 
 
-class MainWindow(QtWidgets.QMainWindow):
+class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+
         self.setWindowTitle("Заказы")
-        self._file_menu = self.menuBar().addMenu("&File")
+        _file_menu = self.menuBar().addMenu("&File")
+        exit_action = QAction("Exit", self)
+        exit_action.triggered.connect(self.close)
+        _file_menu.addAction(exit_action)
 
         self.centralwidget = QWidget(self)
         self.verticalLayout = QVBoxLayout(self.centralwidget)
@@ -93,7 +98,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.findLayout.addWidget(self.findText, stretch=1, alignment=Qt.AlignmentFlag.AlignTop|Qt.AlignmentFlag.AlignRight)
         self.findText.editingFinished.connect(self.find)
 
-        self.table = QtWidgets.QTableView()
+        self.table = QTableView()
+        model = TableModel()
+        self.table.setModel(model)
         self.verticalLayout.addWidget(self.table)
         self.setCentralWidget(self.centralwidget)
 
@@ -115,7 +122,11 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.reply.error() == QNetworkReply.NetworkError.NoError:
             # Читаем данные
             str_catalog = self.reply.readAll().data().decode("utf-8")
-            self.table.setModel(TableModel(str_catalog))
+            model = self.table.model()
+            #self.table.setModel(TableModel(str_catalog))
+            model.beginResetModel()
+            model.catalogs = json.loads(str_catalog)
+            model.endResetModel()
         else:
             # Обработка ошибки
             error_str = self.reply.errorString()
@@ -129,7 +140,7 @@ class MainWindow(QtWidgets.QMainWindow):
         header = self.table.horizontalHeader()    
         header.setSectionResizeMode(3, QHeaderView.Stretch)
         #self.table.resizeColumnToContents(4)
-        #self.table.update       
+        self.table.update       
 
     # @Slot()
     def create_item(self):
@@ -172,10 +183,8 @@ class MainWindow(QtWidgets.QMainWindow):
     # @Slot()
     def find(self):
         self.start_request()
-        self.table.update
 
-
-app = QtWidgets.QApplication(sys.argv)
+app = QApplication(sys.argv)
 window = MainWindow()
 window.setMinimumWidth(800)
 window.setMinimumHeight(600)
