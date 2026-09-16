@@ -6,7 +6,7 @@ from organizations.models import OrganizationModel, ManagerModel
 
 class OrderModel(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    number = models.CharField(max_length=50,default="")
+    number = models.CharField(max_length=50,default="",blank=True)
     date = models.DateField(auto_created=True,blank=True, null=True)
     organization = models.ForeignKey(OrganizationModel, on_delete = models.CASCADE, blank=True, null=True)
     comment = models.TextField(default="",blank=True)
