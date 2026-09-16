@@ -1,11 +1,25 @@
 <div>
 {% csrf_token %}
 {{ order_form.uuid.as_hidden }}
-<div class="input-group mb-3">
+<div class="d-sm-none">
+    <div class="input-group mb-3">
+    <span class="input-group-text"> Номер </span>
+    {{ order_form.number }}
+    </div>
+    <div class="input-group mb-3">
+    <span class="input-group-text mx-1"> от </span>
+    {{ order_form.date }}
+    </div>
+    </div>    
+</div>
+<div class="d-none d-sm-block">
+    <div class="input-group mb-3">
     <span class="input-group-text"> Номер </span>
     {{ order_form.number }}
     <span class="input-group-text mx-1"> от </span>
     {{ order_form.date }}
+    </div>
+    </div>    
 </div>
 <div class="input-group mb-3">
     <span class="input-group-text"> Организация </span>
@@ -28,22 +42,44 @@
         {% for hidden in form.hidden_fields %}
             {{ hidden }}
         {% endfor %}
-        <div class="input-group p-1">
-            <div class="col-6 px-1">    
-            {{ form.assortment }}
+        <div class="d-sm-none border mt-3">
+            <div class="input-group p-1">
+                {{ form.assortment }}
+            </div>    
+            <div class="input-group p-1">
+                <div class="col-2  px-1">
+                {{ form.count }}
+                </div>
+                <div class="col-4  px-1">
+                {{ form.price }}
+                </div>
+                <div class="col-4  px-1">
+                {{ form.summa }}
+                </div>
+                <div class="col-2 px-2">
+                    <div hidden>{{ form.DELETE }}</div>
+                    <button type="button" class="btn btn-danger" onclick="onDeleteLine(this)">X</button>
+                </div>
             </div>
-            <div class="col-1  px-1">
-            {{ form.count }}
-            </div>
-            <div class="col-2  px-1">
-            {{ form.price }}
-            </div>
-            <div class="col-2  px-1">
-            {{ form.summa }}
-            </div>
-            <div class="col-1 px-2">
-                <div hidden>{{ form.DELETE }}</div>
-                <button type="button" class="btn btn-danger" onclick="onDeleteLine(this)">X</button>
+        </div>
+        <div class="d-none d-sm-block">
+            <div class="input-group p-1">
+                <div class="col-6 px-1">    
+                {{ form.assortment }}
+                </div>
+                <div class="col-1  px-1">
+                {{ form.count }}
+                </div>
+                <div class="col-2  px-1">
+                {{ form.price }}
+                </div>
+                <div class="col-2  px-1">
+                {{ form.summa }}
+                </div>
+                <div class="col-1 px-2">
+                    <div hidden>{{ form.DELETE }}</div>
+                    <button type="button" class="btn btn-danger" onclick="onDeleteLine(this)">X</button>
+                </div>
             </div>
         </div>
     {% endfor %}
