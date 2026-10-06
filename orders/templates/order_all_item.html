@@ -42,7 +42,7 @@
         {% for hidden in form.hidden_fields %}
             {{ hidden }}
         {% endfor %}
-        <div class="d-sm-none border mt-3">
+        <!-- <div class="d-sm-none border mt-3">
             <div class="input-group p-1">
                 {{ form.assortment }}
             </div>    
@@ -62,7 +62,7 @@
                 </div>
             </div>
         </div>
-        <div class="d-none d-sm-block">
+        <div class="d-none d-sm-block"> -->
             <div class="input-group p-1">
                 <div class="col-6 px-1">    
                 {{ form.assortment }}
@@ -81,7 +81,7 @@
                     <button type="button" class="btn btn-danger" onclick="onDeleteLine(this)">X</button>
                 </div>
             </div>
-        </div>
+        <!-- </div> -->
     {% endfor %}
 </div>
 </div>

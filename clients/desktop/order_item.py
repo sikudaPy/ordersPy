@@ -56,11 +56,11 @@ class ItemDialog(QDialog):
         tableLayout = QVBoxLayout()
         commandLayout = QHBoxLayout()
         addButton = QPushButton("Добавить строку")
-        addButton.setStyleSheet("QPushButton { background-color: #198754; color: white; }")
+        #addButton.setStyleSheet("QPushButton { background-color: #198754; color: white; }")
         commandLayout.addWidget(addButton,0,alignment=Qt.AlignmentFlag.AlignLeft) 
         addButton.clicked.connect(self.add_line)
         delButton = QPushButton("Удалить строку")
-        delButton.setStyleSheet("QPushButton { background-color: #dc3545; color: white; }")
+        #delButton.setStyleSheet("QPushButton { background-color: #dc3545; color: white; }")
         commandLayout.addWidget(delButton,1,alignment=Qt.AlignmentFlag.AlignRight) 
         delButton.clicked.connect(self.del_line)
         # copyButton = QPushButton("++")
@@ -75,15 +75,49 @@ class ItemDialog(QDialog):
         #buttons       
         layoutButtons = QHBoxLayout()
         write_btn = QPushButton("Записать")
-        write_btn.setStyleSheet("QPushButton { background-color: #0d6efd; color: white; }")
+        #write_btn.setStyleSheet("QPushButton { background-color: #0d6efd; color: white; }")
+        # strStyle = """QPushButton{ 
+        #             font-family: "Segoe UI"; 
+        #             font-size: 8pt; 
+        #             border: 1px solid;
+        #             border-color: rgb(46, 103, 156); 
+        #             border-radius: 3px; 
+        #             padding-right: 10px; 
+        #             padding-left: 10px;
+        #             padding-top: 5px;
+        #             padding-bottom: 5px;
+        #             background-color: rgb(77, 138, 201);
+        #             color: white;
+        #             font: bold;
+        #             width: 64px;
+        #         }
+        #         QPushButton:hover {
+        #             border: 1px solid;
+        #             border-radius: 3px;
+        #             border-color: rgb(33, 77, 115);
+        #         }
+        #         QPushButton:focus {
+        #             outline-color: transparent;
+        #             border: 2px solid;
+        #             border-color: rgb(151, 195, 243);
+        #         }
+        #         QPushButton:pressed{
+        #             background-color: rgb(52, 113, 173);
+        #         }
+        #         QPushButton:disabled {
+        #             color: grey;
+        #             border-color: grey;
+        #             background-color: none;
+        #         }"""
+        # write_btn.setStyleSheet( strStyle )
         layoutButtons.addWidget(write_btn, alignment= Qt.AlignmentFlag.AlignLeft)
         write_btn.clicked.connect(self.write)
         close_btn = QPushButton("Закрыть")
-        close_btn.setStyleSheet("QPushButton { background-color: #6c757d; color: white; }")           
+        #close_btn.setStyleSheet("QPushButton { background-color: #6c757d; color: white; }")           
         layoutButtons.addWidget(close_btn, alignment= Qt.AlignmentFlag.AlignHCenter)
         close_btn.clicked.connect(self.close)
         del_btn = QPushButton("Удалить")
-        del_btn.setStyleSheet("QPushButton { background-color: #dc3545;  color: white;}")
+        #del_btn.setStyleSheet("QPushButton { background-color: #dc3545;  color: white;}")
         layoutButtons.addWidget(del_btn, alignment= Qt.AlignmentFlag.AlignRight)
         del_btn.clicked.connect(self.delete)
         layout.addLayout(layoutButtons)

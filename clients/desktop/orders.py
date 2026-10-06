@@ -89,7 +89,7 @@ class MainWindow(QMainWindow):
         self.verticalLayout.insertLayout(0, self.findLayout)
         self.findLayout.addWidget(QLabel("Список заказов"), stretch=0, alignment=Qt.AlignmentFlag.AlignBaseline|Qt.AlignmentFlag.AlignLeft)
         addButton = QPushButton("Добавить")
-        addButton.setStyleSheet("QPushButton { background-color: #0d6efd; color: white; }")
+        #addButton.setStyleSheet("QPushButton{ border: 3px solid; border-color: blue; border-radius: 3px; }");#background-color: #0d6efd; color: white; }")
         self.findLayout.addWidget(addButton, stretch=0, alignment=Qt.AlignmentFlag.AlignTop|Qt.AlignmentFlag.AlignLeft)
         addButton.clicked.connect(self.create_item)
         self.findText = QLineEdit()
