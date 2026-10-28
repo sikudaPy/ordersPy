@@ -164,7 +164,8 @@ class OrdersListAPI(APIView):
     permission_classes = (permissions.IsAuthenticated,)
     def get(self, request, format=None):
         strFind = request.GET.get("strFind") or ""
-        orders = getOrdersByFilter(strFind)
+        org = get_organization_by_request(request)
+        orders = getOrdersByFilter(strFind).filter(organization=org)
         serializer = OrderListSerializer(orders, many=True)
         return Response(serializer.data)
 
