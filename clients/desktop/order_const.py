@@ -5,8 +5,8 @@ from PySide6.QtNetwork import QNetworkRequest
 
 #local for test
 #credentials = "admin:"
-strBaseUrl = "http://127.0.0.1:8000/orders-api/" 
-#strBaseUrl = "https://orders.python1c.ru/orders-api/"
+#strBaseUrl = "http://127.0.0.1:8000/orders-api/" 
+strBaseUrl = "https://orders.python1c.ru/orders-api/"
 credentials = "Миста1:Волшебный форум"
 
 def getRequestAuth(strUrl: str = ""):

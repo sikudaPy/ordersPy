@@ -121,16 +121,17 @@ class MainWindow(QMainWindow):
     def handle_response(self):
         if self.reply.error() == QNetworkReply.NetworkError.NoError:
             str_catalog = self.reply.readAll().data().decode("utf-8")
-            model = self.table.model()
-            model.beginResetModel()
-            model.catalogs = json.loads(str_catalog)
-            model.endResetModel()
+
         else:
             # Обработка ошибки
             error_str = self.reply.errorString()
-            str_catalog = '[{"id":""7e4a9356-949f-484b-bbdc-51966604afff"","number":"0001","date":"-","organization":"","comment":"","summa"="0.0"}]'
-            self.table.setModel(TableModel(str_catalog))
-            
+            str_catalog = '[{"uuid":"7e4a9356-949f-484b-bbdc-51966604afff","number":"0001","date":"-","organization":"", "org_name":"", "comment":"'+error_str+'","summa":"0.0"}]'
+
+        model = self.table.model()
+        model.beginResetModel()
+        model.catalogs = json.loads(str_catalog)
+        model.endResetModel()
+
         self.reply.deleteLater()
         self.table.resizeColumnToContents(0)
         self.table.resizeColumnToContents(1)
