@@ -138,6 +138,15 @@ def order_save(request, order=None):
 
         for item in assort_formset.deleted_objects:
             item.delete()    
+    else:
+        return render(request, 'order_all_item.html',
+                              {
+                                  'order_form': order_form,
+                                  'assort_formset': assort_formset
+                              })
+
+
+        
 
 def order_del(request, pk):   
     if request.method == 'POST':

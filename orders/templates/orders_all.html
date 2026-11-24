@@ -113,33 +113,16 @@
   }
   
   async function onNewLine(){ 
-    const totalForms = document.getElementById("itemModalBodyLines");
-    let lines = totalForms.querySelectorAll('.input-group');
-    if( totalForms && lines.length > 0 ){
-      const num = lines.length;
-      for(i = 1; i<10; i++){
-        if(lines[num-i].style.display == 'none'){
-          lines[num-i].style.display = '';
-          break;
-        }
-      }   
-    }   
-//       const totalForms = document.getElementById("itemModalBodyLines");
-//       const lastLine = totalForms.lastElementChild;
-//       const elemArray = lastLine.children[0].children[0].id.split("-");
-//       const newCountId = elemArray[1].replace(/(\d+)+/g, function(match, number) {
-//          return parseInt(number)+1;
-//       });
-//       const clonedLine   = totalForms.lastElementChild.cloneNode(true);
-//       for(item in clonedLine.children){
-//         setIdElem(clonedLine.children[item], newCountId)
-//         for(item2 in clonedLine.children[item].children){
-//           setIdElem(clonedLine.children[item].children[item2], newCountId)
-//         }
-//       }
-//       totalForms.appendChild(clonedLine);
-//       const countForms = document.getElementById("id_orderassortmenttablemodel_set-TOTAL_FORMS")
-//       countForms.value = parseInt(countForms.value)+1; 
+    const totalForm = document.getElementById('id_table-TOTAL_FORMS');
+    const lastIndex = parseInt(totalForm.value)-1;
+    const containerForms = document.getElementById("itemModalBodyLines");
+    const lastLine = containerForms.lastElementChild;
+    const clonedLine   = containerForms.lastElementChild.cloneNode(true);
+    tempPrefix = 'table-'+lastIndex.toString()+'/g'
+    clonedLine.innerHTML = clonedLine.innerHTML.replace(tempPrefix, 'table-'+lastIndex);
+    containerForms.appendChild(clonedLine);
+    containerForms.lastElementChild.children[0].children[0].value = lastIndex + 2;
+    totalForm.value = lastIndex + 2;
   }
   
   async function onDeleteLine(curDelete){
@@ -188,14 +171,14 @@
   }
 
   function hideLastEmptyLines(){
-    const totalForms = document.getElementById("itemModalBodyLines");
-    let lines = totalForms.querySelectorAll('.input-group');
-    if( totalForms && lines.length > 0 ){
-      const num = lines.length;
-      for(i = 1; i<10; i++){
-        lines[num-i].style.display = 'none';
-      }   
-    }     
+    // const totalForms = document.getElementById("itemModalBodyLines");
+    // let lines = totalForms.querySelectorAll('.input-group');
+    // if( totalForms && lines.length > 0 ){
+    //   const num = lines.length;
+    //   for(i = 1; i<10; i++){
+    //     lines[num-i].style.display = 'none';
+    //   }   
+    // }     
   } 
 </script>
 {% endblock %}

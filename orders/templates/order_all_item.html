@@ -42,29 +42,11 @@
         {% for hidden in form.hidden_fields %}
             {{ hidden }}
         {% endfor %}
-        <!-- <div class="d-sm-none border mt-3">
             <div class="input-group p-1">
-                {{ form.assortment }}
-            </div>    
-            <div class="input-group p-1">
-                <div class="col-2  px-1">
-                {{ form.count }}
+                <div class="col-1 px-1"> 
+                <input type="text" value="{{ forloop.counter }}" class="form-control text-end" disabled/>       
                 </div>
-                <div class="col-4  px-1">
-                {{ form.price }}
-                </div>
-                <div class="col-4  px-1">
-                {{ form.summa }}
-                </div>
-                <div class="col-2 px-2">
-                    <div hidden>{{ form.DELETE }}</div>
-                    <button type="button" class="btn btn-danger" onclick="onDeleteLine(this)">X</button>
-                </div>
-            </div>
-        </div>
-        <div class="d-none d-sm-block"> -->
-            <div class="input-group p-1">
-                <div class="col-6 px-1">    
+                <div class="col-5 px-1">    
                 {{ form.assortment }}
                 </div>
                 <div class="col-1  px-1">
@@ -81,7 +63,6 @@
                     <button type="button" class="btn btn-danger" onclick="onDeleteLine(this)">X</button>
                 </div>
             </div>
-        <!-- </div> -->
     {% endfor %}
 </div>
 </div>
