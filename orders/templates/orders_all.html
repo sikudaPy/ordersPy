@@ -119,19 +119,25 @@
     const lastLine = containerForms.lastElementChild;
     const clonedLine   = containerForms.lastElementChild.cloneNode(true);
     tempPrefix = 'table-'+lastIndex.toString()+'/g'
-    clonedLine.innerHTML = clonedLine.innerHTML.replace(tempPrefix, 'table-'+lastIndex);
+    clonedLine.innerHTML = clonedLine.innerHTML.replace(tempPrefix, 'table-'+(lastIndex+1).toString());
     containerForms.appendChild(clonedLine);
     containerForms.lastElementChild.children[0].children[0].value = lastIndex + 2;
     totalForm.value = lastIndex + 2;
   }
   
   async function onDeleteLine(curDelete){
-    const totalForms = document.getElementById("itemModalBodyLines"); 
     const currentLine   = curDelete.parentNode.parentNode; 
-    if( totalForms.children.length > 6){
-      currentLine.hidden = true;
-      curDelete.parentNode.children[0].children[0].checked = true;
-    }    
+    currentLine.hidden = true;
+    curDelete.parentNode.children[0].children[0].checked = true;
+  
+    //нумерация строк последовательная
+    const totalForms = document.getElementById("itemModalBodyLines"); 
+    const linesList = totalForms.getElementsByClassName('input-group');
+    let k = 1;
+    for (let i = 0; i < linesList.length; i++) {
+      if(!linesList[i].hidden)
+        linesList[i].children[0].children[0].value = k++;//номер строки
+    }   
   }
 
   function setIdElem(item, newCountId){
